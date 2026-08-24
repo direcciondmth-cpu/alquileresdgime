@@ -1,473 +1,577 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Alquileres SIPROSA</title>
-  <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR63Km1cK7f1rtCkJYVNwWfpNYagVHr6y9KKesIGshxaBWtfIGXsmOdR5ga&amp;s=10">
-  <style>
-    :root{--blue:#0E4C73;--teal:#1C818C;--aqua:#32A6A6;--lime:#9BA646;--paper:#F2F2F2;--ink:#123446;--line:#d7e3e5}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--paper);color:var(--ink);font:14px Inter,system-ui,sans-serif}
-    .top{background:linear-gradient(110deg,var(--blue),var(--teal));color:white;padding:10px 5%;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
-    .brand{display:flex;align-items:center;gap:10px}
-    .brand img{width:48px;height:48px;object-fit:contain;border-radius:50%;background:#fff;padding:2px}
-    .brand b{font-size:20px}
-    .brand small{display:block;opacity:.8}
-    .nav{display:flex;gap:5px}
-    .nav button{background:transparent;color:#ddf3f3}
-    .nav button.active{background:#ffffff28}
-    .push{margin-left:auto}
-    button{border:0;border-radius:9px;padding:10px 13px;background:var(--teal);color:white;font:inherit;font-weight:750;cursor:pointer}
-    button.secondary{background:#e0f0f0;color:var(--blue)}
-    button.danger{background:#c34141}
-    .count{background:var(--lime);color:#273000;border-radius:12px;padding:2px 6px;font-size:11px}
-    .page{max-width:1450px;margin:auto;padding:25px 18px}
-    .view{display:none}
-    .view.active{display:block}
-    .title{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:18px}
-    .title h1{margin:0;font-size:27px}
-    .title p{margin:4px 0;color:#63808b}
-    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:16px}
-    .hero-main{background:linear-gradient(125deg,var(--blue),var(--teal));color:#fff;border-radius:17px;padding:24px;min-height:180px;position:relative;overflow:hidden}
-    .hero-main:after{content:'';position:absolute;width:210px;height:210px;border:34px solid #ffffff1e;border-radius:50%;right:-65px;top:-85px}
-    .hero-main h2{margin:0;font-size:24px}
-    .hero-main p{max-width:470px;opacity:.85}
-    .hero-main b{font-size:34px;display:block;margin-top:22px}
-    .chart{background:#fff;border-radius:17px;padding:17px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:18px}
-    .donut{width:125px;height:125px;border-radius:50%;background:conic-gradient(var(--aqua) 0 60%,var(--lime) 60% 85%,#dfe9ea 85%);position:relative}
-    .donut:after{content:'Vigencia';position:absolute;inset:27px;background:#fff;border-radius:50%;display:grid;place-items:center;text-align:center;font-size:12px;font-weight:800;color:var(--blue)}
-    .legend div{margin:8px 0;font-size:12px}
-    .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
-    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-    .stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px;border-top:4px solid var(--teal)}
-    .stat:nth-child(2){border-color:var(--aqua)}
-    .stat:nth-child(3){border-color:var(--lime)}
-    .stat:nth-child(4){border-color:#dc6e4a}
-    .stat:nth-child(5){border-color:var(--blue)}
-    .stat span{display:block;color:#66818a;font-size:12px;font-weight:700}
-    .stat b{display:block;font-size:25px;margin-top:7px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-    .panel{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-    .head{padding:15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
-    .head h2{margin:0;font-size:15px}
-    .head a{color:var(--teal);font-weight:800;cursor:pointer}
-    .items{padding:5px 15px}
-    .item{display:flex;align-items:center;gap:9px;padding:11px 0;border-bottom:1px solid #edf2f3}
-    .item:last-child{border:0}
-    .item div{flex:1}
-    .item small{color:#66818a}
-    .dot{width:9px;height:9px;border-radius:50%;background:var(--lime)}
-    .toolbar{padding:13px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
-    input,select,textarea{border:1px solid #c9dbdf;border-radius:8px;padding:9px;font:inherit;color:var(--ink)}
-    .toolbar input{min-width:240px;flex:1}
-    .table{overflow:auto;max-height:68vh}
-    table{border-collapse:collapse;width:100%;min-width:950px}
-    th{position:sticky;top:0;background:#edf8f7;color:var(--blue);padding:11px;text-align:left;font-size:11px}
-    td{padding:10px;border-top:1px solid #edf1f2;vertical-align:top}
-    tbody tr{cursor:pointer}
-    tbody tr:hover td{background:#f4fbfb}
-    .tag{padding:4px 8px;border-radius:20px;background:#e9eff0;font-size:11px;font-weight:800;display:inline-block}
-    .VIGENTE{background:#dff3e7;color:#17643d}
-    .VENCIDO{background:#ffe5e5;color:#a52e2e}
-    .PROXIMO{background:#fff3ca;color:#866100}
-    .actions{display:flex;gap:4px}
-    .actions button{padding:6px;font-size:11px}
-    .modal,.loader{display:none;position:fixed;inset:0;background:#08313b91;align-items:center;justify-content:center;z-index:5;padding:15px}
-    .modal.show,.loader.show{display:flex}
-    .dialog{background:#fff;border-radius:16px;padding:22px;max-height:92vh;overflow:auto;width:min(960px,100%)}
-    .row{display:flex;justify-content:space-between;gap:10px}
-    .form{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
-    .form label{font-size:11px;font-weight:800;color:#52717a}
-    .form input,.form select,.form textarea{width:100%;display:block;margin-top:4px}
-    .wide{grid-column:span 2}
-    .full{grid-column:1/-1}
-    .details{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;background:#f3f9f8;padding:13px;border-radius:10px;margin:14px 0}
-    .details span{font-size:11px;color:#66818a;font-weight:700}
-    .details b{display:block;margin-top:3px}
-    .move{padding:10px 0;border-bottom:1px solid #e8eff0}
-    .empty{padding:18px;text-align:center;color:#66818a}
-    .spin{width:43px;height:43px;border:5px solid #fff5;border-top-color:#fff;border-radius:50%;animation:r 1s linear infinite}
-    @keyframes r{to{transform:rotate(360deg)}}
-    @media(max-width:850px){.hero,.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}.form{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:540px){.top{padding:10px 14px}.nav{order:3;width:100%;justify-content:space-between}.push{display:none}.page{padding:17px 10px}.stats{grid-template-columns:repeat(2,1fr)}.form{grid-template-columns:1fr}.wide,.full{grid-column:auto}.details{grid-template-columns:repeat(2,1fr)}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alquileres SIPROSA · Panel de Control</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{
+  --azul-950:#0b1f2a;
+  --azul-900:#102c3b;
+  --azul-800:#163c50;
+  --azul-700:#1f5670;
+  --azul-500:#3d7fa0;
+  --azul-100:#e6eef2;
+  --hueso:#f6f4ee;
+  --hueso-2:#eeeae0;
+  --linea:#d7d2c4;
+  --tinta:#1b2320;
+  --tinta-suave:#5a6360;
+  --verde:#3f7d5c;
+  --verde-bg:#e3ede4;
+  --ambar:#b8860f;
+  --ambar-bg:#f7ecd2;
+  --rojo:#a13f3f;
+  --rojo-bg:#f3e0df;
+  --gris-bg:#e9e7e1;
+  --radio:3px;
+  --mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  --serif: 'Source Serif 4', Georgia, serif;
+  --sans: 'IBM Plex Sans', -apple-system, Segoe UI, sans-serif;
+}
+@font-face{font-family:'IBM Plex Sans';src:local('Segoe UI');}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--hueso);color:var(--tinta);font-family:var(--sans);}
+::selection{background:var(--azul-700);color:#fff;}
+
+/* ---------- Header ---------- */
+header.top{
+  background:var(--azul-950);
+  color:#fff;
+  padding:18px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+  border-bottom:3px solid var(--azul-700);
+}
+.brand{display:flex;align-items:baseline;gap:12px;}
+.brand .mark{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  background:var(--azul-700);
+  color:#fff;
+  padding:3px 8px;
+  border-radius:2px;
+}
+.brand h1{font-family:var(--serif);font-weight:600;font-size:20px;margin:0;letter-spacing:.01em;}
+.brand p{margin:2px 0 0;font-size:12px;color:#b8c7cf;font-family:var(--mono);}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+button{
+  font-family:var(--sans);
+  cursor:pointer;
+  border-radius:var(--radio);
+}
+.btn{
+  border:1px solid var(--linea);
+  background:#fff;
+  color:var(--tinta);
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:transform .08s ease, background .15s ease, border-color .15s ease;
+}
+.btn:hover{background:var(--hueso-2);border-color:var(--azul-500);}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--azul-700);color:#fff;border-color:var(--azul-700);}
+.btn-primary:hover{background:var(--azul-800);}
+.btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.35);}
+.btn-ghost:hover{background:rgba(255,255,255,.1);}
+.btn-danger{color:var(--rojo);border-color:var(--rojo);background:#fff;}
+.btn-danger:hover{background:var(--rojo-bg);}
+.btn-sm{padding:5px 9px;font-size:12px;}
+
+/* ---------- Layout ---------- */
+main{max-width:1360px;margin:0 auto;padding:24px 28px 60px;}
+
+.resumen{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:1px;
+  background:var(--linea);
+  border:1px solid var(--linea);
+  margin-bottom:26px;
+}
+.card-kpi{background:var(--hueso);padding:16px 18px;}
+.card-kpi .n{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1;}
+.card-kpi .l{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--tinta-suave);margin-top:6px;}
+.card-kpi.alerta-roja .n{color:var(--rojo);}
+.card-kpi.alerta-amarilla .n{color:var(--ambar);}
+.card-kpi.alerta-verde .n{color:var(--verde);}
+
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--azul-700);margin:0 0 6px;
+}
+.section-title{font-family:var(--serif);font-size:22px;margin:0 0 4px;}
+
+.toolbar{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  margin:28px 0 14px;
+}
+.filtros{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.filtros input[type=text], .filtros select{
+  font-family:var(--sans);font-size:13px;
+  padding:8px 10px;border:1px solid var(--linea);border-radius:var(--radio);
+  background:#fff;color:var(--tinta);
+}
+.filtros input[type=text]{min-width:220px;}
+.pill{
+  font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:20px;
+  border:1px solid var(--linea);background:#fff;cursor:pointer;color:var(--tinta-suave);
+}
+.pill.activo{background:var(--azul-700);color:#fff;border-color:var(--azul-700);}
+
+/* ---------- Tabla ---------- */
+.tabla-wrap{border:1px solid var(--linea);background:#fff;overflow-x:auto;}
+table{border-collapse:collapse;width:100%;font-size:13px;}
+thead th{
+  text-align:left;padding:10px 12px;background:var(--azul-950);color:#e9eef0;
+  font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+  white-space:nowrap;position:sticky;top:0;
+}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--hueso-2);white-space:nowrap;}
+tbody tr:hover{background:var(--azul-100);}
+tbody tr:last-child td{border-bottom:none;}
+td.num{font-family:var(--mono);text-align:right;}
+td.acciones{display:flex;gap:6px;}
+
+.badge{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;
+  font-size:11.5px;font-weight:600;font-family:var(--sans);
+}
+.badge-rojo{background:var(--rojo-bg);color:var(--rojo);}
+.badge-ambar{background:var(--ambar-bg);color:var(--ambar);}
+.badge-verde{background:var(--verde-bg);color:var(--verde);}
+.badge-gris{background:var(--gris-bg);color:var(--tinta-suave);}
+
+.vacio{padding:50px 20px;text-align:center;color:var(--tinta-suave);}
+.vacio .icono{font-size:26px;margin-bottom:6px;}
+
+/* ---------- Modal ---------- */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(11,31,42,.55);display:none;
+  align-items:center;justify-content:center;z-index:50;padding:20px;
+}
+.modal-bg.abierto{display:flex;}
+.modal{
+  background:var(--hueso);border:1px solid var(--linea);max-width:640px;width:100%;
+  max-height:88vh;overflow:auto;
+}
+.modal-head{
+  background:var(--azul-950);color:#fff;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;
+}
+.modal-head h3{margin:0;font-family:var(--serif);font-size:18px;font-weight:600;}
+.modal-body{padding:22px;}
+.campo{margin-bottom:14px;}
+.campo label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta-suave);margin-bottom:5px;}
+.campo input, .campo select{
+  width:100%;padding:9px 10px;border:1px solid var(--linea);border-radius:var(--radio);font-size:14px;font-family:var(--sans);background:#fff;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.modal-foot{padding:16px 22px;border-top:1px solid var(--linea);display:flex;justify-content:flex-end;gap:8px;}
+
+.toast{
+  position:fixed;bottom:22px;right:22px;background:var(--azul-950);color:#fff;
+  padding:12px 18px;border-radius:var(--radio);font-size:13px;z-index:100;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);display:none;border-left:4px solid var(--verde);
+}
+.toast.error{border-left-color:var(--rojo);}
+.toast.mostrar{display:block;animation:aparecer .2s ease;}
+@keyframes aparecer{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.config-note{
+  font-family:var(--mono);font-size:11.5px;color:var(--tinta-suave);
+  background:var(--hueso-2);border:1px dashed var(--linea);padding:10px 14px;margin-bottom:20px;
+}
+.config-note code{background:#fff;padding:1px 5px;border:1px solid var(--linea);}
+
+footer{
+  text-align:center;padding:26px;color:var(--tinta-suave);font-family:var(--mono);font-size:11px;
+  border-top:1px solid var(--linea);
+}
+@media(max-width:900px){
+  .resumen{grid-template-columns:repeat(2,1fr);}
+  .grid2{grid-template-columns:1fr;}
+  main{padding:16px;}
+  thead th, tbody td{padding:8px;}
+}
+</style>
 </head>
 <body>
+
 <header class="top">
   <div class="brand">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR63Km1cK7f1rtCkJYVNwWfpNYagVHr6y9KKesIGshxaBWtfIGXsmOdR5ga&amp;s=10" alt="SIPROSA Logo">
-    <div><b>SIPROSA</b><small>Gestión de Alquileres · Recursos Físicos</small></div>
+    <span class="mark">SIPROSA</span>
+    <div>
+      <h1>Alquileres · Dirección de Recursos Físicos</h1>
+      <p id="ultima-actualizacion">cargando datos…</p>
+    </div>
   </div>
-  <nav class="nav">
-    <button id="n-inicio" class="active" onclick="showView('inicio')">Inicio</button>
-    <button id="n-alquileres" onclick="showView('alquileres')">Alquileres</button>
-    <button id="n-alertas" onclick="showView('alertas')">♧ Alertas <span class="count" id="count">0</span></button>
-  </nav>
-  <span class="push"></span>
-  <button class="secondary" onclick="loadApp()">↻ Actualizar</button>
+  <div class="top-actions">
+    <button class="btn btn-ghost" id="btn-refrescar">↻ Refrescar</button>
+    <button class="btn btn-ghost" id="btn-exportar-excel">⇩ Excel</button>
+    <button class="btn btn-ghost" id="btn-exportar-pdf">⇩ PDF</button>
+    <button class="btn btn-primary" id="btn-nuevo">+ Nuevo alquiler</button>
+  </div>
 </header>
 
-<main class="page">
-  <section id="v-inicio" class="view active">
-    <div class="title">
-      <div><h1>Inicio</h1><p>Control de inmuebles, contratos y documentación.</p></div>
-      <button onclick="openForm()">＋ Nuevo alquiler</button>
+<main>
+
+  <div class="config-note" id="config-note">
+    ⚙ Falta conectar la API. Editá la constante <code>API_URL</code> al final de este archivo con la URL de tu implementación de Google Apps Script.
+  </div>
+
+  <p class="eyebrow">Panorama general</p>
+  <h2 class="section-title">Resumen de la cartera de inmuebles</h2>
+
+  <div class="resumen" id="kpis">
+    <div class="card-kpi"><div class="n" id="kpi-total">–</div><div class="l">Inmuebles totales</div></div>
+    <div class="card-kpi"><div class="n" id="kpi-activos">–</div><div class="l">Contratos activos</div></div>
+    <div class="card-kpi alerta-roja"><div class="n" id="kpi-vencidos">–</div><div class="l">Vencidos</div></div>
+    <div class="card-kpi alerta-amarilla"><div class="n" id="kpi-porvencer">–</div><div class="l">Por vencer (30 días)</div></div>
+    <div class="card-kpi"><div class="n" id="kpi-monto">–</div><div class="l">Monto mensual total</div></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="filtros">
+      <input type="text" id="buscador" placeholder="Buscar por servicio, domicilio, locador o expediente…">
+      <select id="filtro-estado">
+        <option value="">Todos los estados de trámite</option>
+        <option value="EN TRAMITE">En trámite</option>
+        <option value="FALTA RESOL.">Falta resolución</option>
+        <option value="DE BAJA">De baja</option>
+      </select>
+      <span class="pill activo" data-vig="">Todos</span>
+      <span class="pill" data-vig="VIGENTE">🟢 Vigentes</span>
+      <span class="pill" data-vig="POR VENCER">🟡 Por vencer</span>
+      <span class="pill" data-vig="VENCIDO">🔴 Vencidos</span>
+      <span class="pill" data-vig="SIN DATO">⚪ Sin dato</span>
     </div>
-    <div class="hero">
-      <div class="hero-main">
-        <h2>Panel de control</h2>
-        <p>Seguimiento centralizado de los alquileres del SIPROSA, vencimientos y expedientes.</p>
-        <b id="heroMoney">$ 0</b>
-        <small>Monto mensual actualmente vigente</small>
+  </div>
+
+  <div class="tabla-wrap">
+    <table id="tabla-alquileres">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Servicio / Efector</th>
+          <th>Domicilio</th>
+          <th>Locador</th>
+          <th>Expediente</th>
+          <th>Fin de contrato</th>
+          <th class="num">Monto ($)</th>
+          <th>Estado trámite</th>
+          <th>Vigencia</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-alquileres">
+        <tr><td colspan="10" class="vacio">
+          <div class="icono">⏳</div>Cargando información desde la base…
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer>SIPROSA · Panel de gestión de alquileres · uso interno</footer>
+
+<!-- ---------- Modal alta/edición ---------- -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-titulo">Nuevo alquiler</h3>
+      <button class="btn btn-ghost btn-sm" id="btn-cerrar-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f-id">
+      <div class="campo"><label>Servicio / Efector</label><input type="text" id="f-servicio"></div>
+      <div class="grid2">
+        <div class="campo"><label>Domicilio</label><input type="text" id="f-domicilio"></div>
+        <div class="campo"><label>Locador</label><input type="text" id="f-locador"></div>
       </div>
-      <div class="chart">
-        <div class="donut"></div>
-        <div class="legend">
-          <b>Estado general</b>
-          <div><i style="background:#32A6A6"></i><span id="lg1">0 vigentes</span></div>
-          <div><i style="background:#9BA646"></i><span id="lg2">0 próximos</span></div>
-          <div><i style="background:#dfe9ea"></i><span id="lg3">0 vencidos</span></div>
+      <div class="grid2">
+        <div class="campo"><label>Expediente</label><input type="text" id="f-expediente"></div>
+        <div class="campo"><label>Índice de actualización</label><input type="text" id="f-indice"></div>
+      </div>
+      <div class="grid2">
+        <div class="campo"><label>Fecha de inicio</label><input type="date" id="f-fecha-inicio"></div>
+        <div class="campo"><label>Fecha de fin</label><input type="date" id="f-fecha-fin"></div>
+      </div>
+      <div class="grid2">
+        <div class="campo"><label>Monto actual ($)</label><input type="number" step="0.01" id="f-monto"></div>
+        <div class="campo">
+          <label>Estado de trámite</label>
+          <select id="f-estado">
+            <option value="">—</option>
+            <option value="EN TRAMITE">En trámite</option>
+            <option value="FALTA RESOL.">Falta resolución</option>
+            <option value="DE BAJA">De baja</option>
+            <option value="APROBADO">Aprobado</option>
+          </select>
         </div>
       </div>
     </div>
-    <div class="stats" id="stats"></div>
-    <div class="grid">
-      <div class="panel">
-        <div class="head"><h2>Alertas abiertas</h2><a onclick="showView('alertas')">Ver todas →</a></div>
-        <div id="homeAlerts" class="items"></div>
-      </div>
-      <div class="panel">
-        <div class="head"><h2>Próximos vencimientos</h2><a onclick="goRentals('PROXIMO VENCIMIENTO')">Abrir módulo →</a></div>
-        <div id="soon" class="items"></div>
-      </div>
+    <div class="modal-foot">
+      <button class="btn" id="btn-cancelar-modal">Cancelar</button>
+      <button class="btn btn-primary" id="btn-guardar-modal">Guardar</button>
     </div>
-  </section>
-
-  <section id="v-alquileres" class="view">
-    <div class="title">
-      <div><h1>Alquileres</h1><p>Hacé clic en un alquiler para abrir su ficha e historial.</p></div>
-      <div>
-        <button class="secondary" onclick="exportExcel()">⇩ Excel</button>
-        <button class="secondary" onclick="window.print()">▣ PDF</button>
-        <button onclick="openForm()">＋ Nuevo</button>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="toolbar">
-        <input id="q" oninput="renderRentals()" placeholder="Servicio, domicilio, locador, expediente o ID">
-        <select id="fv" onchange="renderRentals()">
-          <option value="">Todas las vigencias</option>
-          <option>VIGENTE</option>
-          <option>PROXIMO VENCIMIENTO</option>
-          <option>VENCIDO</option>
-          <option>SIN FECHA</option>
-        </select>
-        <select id="fa" onchange="renderRentals()">
-          <option value="">Todos los estados</option>
-          <option>EN TRAMITE</option>
-          <option>FALTA RESOLUCION</option>
-          <option>BAJA</option>
-          <option>SIN ESTADO</option>
-        </select>
-        <b id="result"></b>
-      </div>
-      <div class="table">
-        <table>
-          <thead>
-            <tr>
-              <th>Servicio / inmueble</th>
-              <th>Expediente</th>
-              <th>Locador</th>
-              <th>Fin</th>
-              <th>Monto</th>
-              <th>Vigencia</th>
-              <th>Documentación</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <section id="v-alertas" class="view">
-    <div class="title">
-      <div><h1>Alertas</h1><p>Vencimientos, documentación y expedientes.</p></div>
-      <button class="secondary" onclick="loadApp()">↻ Actualizar</button>
-    </div>
-    <div class="panel">
-      <div class="table">
-        <table>
-          <thead>
-            <tr>
-              <th>Prioridad</th>
-              <th>Tipo</th>
-              <th>Mensaje</th>
-              <th>Alquiler</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="alertRows"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-</main>
-
-<div id="loader" class="loader"><div class="spin"></div></div>
-
-<div id="fm" class="modal">
-  <div class="dialog">
-    <div class="row">
-      <div><h2 id="ft">Nuevo alquiler</h2><p class="hint">Vigencia y días se calculan automáticamente.</p></div>
-      <button class="secondary" onclick="hideModal('fm')">×</button>
-    </div>
-    <form onsubmit="save(event)">
-      <div id="fields" class="form"></div>
-      <p style="text-align:right">
-        <button type="button" class="secondary" onclick="hideModal('fm')">Cancelar</button>
-        <button type="submit">Guardar</button>
-      </p>
-    </form>
   </div>
 </div>
 
-<div id="hm" class="modal">
-  <div class="dialog">
-    <div class="row">
-      <div><h2 id="ht"></h2><p id="hs" class="hint"></p></div>
-      <button class="secondary" onclick="hideModal('hm')">×</button>
-    </div>
-    <div id="hc"></div>
-    <p style="text-align:right">
-      <button class="secondary" onclick="hideModal('hm')">Cerrar</button>
-      <button id="he">Editar</button>
-    </p>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-// =========================================================================
-// REEMPLAZÁ ESTA URL POR LA DE TU DESPLIEGUE EN GOOGLE APPS SCRIPT (/exec)
-// =========================================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsdmA6FRokSrXgQwcL4VgTAO4FEOfFOt3kwgpzoXRP8vpN-1CnFynFqAIV-ickOKoQHg/exec';
+/* ============================================================
+   CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
+   de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
+   ============================================================ */
+const API_URL = "PEGAR_ACA_LA_URL_DEL_WEB_APP_DE_APPS_SCRIPT";
+const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
-const S = { alquileres: [], alertas: [], indicadores: {}, view: 'inicio' };
-const F = [
-  ['ID_ALQUILER', 'ID', 'text', 1],
-  ['N_EXPEDIENTE_RESOLUCION', 'Expediente / resolución'],
-  ['N_INTERNO', 'N° interno', 'number'],
-  ['SERVICIO', 'Servicio / área', 'text', 0, 'wide'],
-  ['DOMICILIO', 'Domicilio', 'text', 0, 'wide'],
-  ['LOCADOR', 'Locador', 'text', 0, 'wide'],
-  ['FECHA_INICIO', 'Inicio', 'date'],
-  ['FECHA_FIN', 'Fin', 'date'],
-  ['FRECUENCIA_AJUSTE', 'Frecuencia'],
-  ['INDICE_AJUSTE', 'Índice'],
-  ['MONTO_MENSUAL', 'Monto mensual', 'number'],
-  ['ESTADO_ADMINISTRATIVO', 'Estado', 'select', 0, '', ['SIN ESTADO', 'EN TRAMITE', 'FALTA RESOLUCION', 'BAJA']],
-  ['DOCUMENTACION', 'Documentación', 'select', 0, '', ['PENDIENTE DE RELEVAR', 'INCOMPLETA', 'COMPLETA', 'NO REQUIERE']],
-  ['SEGUIMIENTO_EXPEDIENTE', 'Expediente', 'select', 0, '', ['PENDIENTE DE RELEVAR', 'AL DIA', 'EN TRAMITE', 'DEMORADO', 'CERRADO']],
-  ['LINK_DRIVE', 'Link Drive', 'url', 0, 'wide'],
-  ['OBSERVACIONES', 'Observaciones', 'textarea', 0, 'full'],
-  ['ACTIVO', 'Activo', 'select', 0, '', ['SI', 'NO']]
-];
+let DATA = [];
+let FILTRO_VIGENCIA = "";
 
-const e = x => String(x ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[c]));
-const d = x => x ? String(x).slice(0, 10).split('-').reverse().join('/') : '—';
-const m = x => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(+x || 0);
-const tag = x => `<span class="tag ${String(x || 'SIN').startsWith('PROXIMO') ? 'PROXIMO' : String(x || 'SIN').split(' ')[0]}">${e(x || 'SIN ESTADO')}</span>`;
-
-function api(a, p = {}) {
-  return new Promise((ok, no) => {
-    if (!SCRIPT_URL.startsWith('https://script.google.com')) return no(Error('Configurá SCRIPT_URL con la URL /exec de Apps Script.'));
-    let c = 'cb' + Date.now(), s = document.createElement('script'), z = () => { delete window[c]; s.remove(); };
-    window[c] = r => { z(); r.ok ? ok(r.data) : no(Error(r.error || 'Error de Apps Script')); };
-    s.onerror = () => { z(); no(Error('No se pudo conectar con Apps Script.')); };
-    let x = btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    s.src = `${SCRIPT_URL}?action=${a}&prefix=${c}&payload=${x}`;
-    document.body.appendChild(s);
-  });
+/* ---------- Utilidades ---------- */
+function formatoMoneda(n){
+  if(n===null||n===undefined||n==="") return "—";
+  return "$ " + Number(n).toLocaleString("es-AR",{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+function formatoFecha(f){
+  if(!f) return "—";
+  const d = new Date(f + "T00:00:00");
+  if(isNaN(d)) return f;
+  return d.toLocaleDateString("es-AR");
+}
+function badgeVigencia(estado, dias){
+  const map = {
+    "VENCIDO": ["badge-rojo","🔴 Vencido"],
+    "POR VENCER": ["badge-ambar", `🟡 Vence en ${dias} días`],
+    "VIGENTE": ["badge-verde","🟢 Vigente"],
+    "SIN DATO": ["badge-gris","⚪ Sin dato"]
+  };
+  const [cls, txt] = map[estado] || ["badge-gris", estado || "—"];
+  return `<span class="badge ${cls}">${txt}</span>`;
+}
+function mostrarToast(msg, esError){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast mostrar" + (esError ? " error" : "");
+  setTimeout(()=>t.className="toast", 3200);
 }
 
-async function loadApp() {
-  const loaderEl = document.getElementById('loader');
-  if (loaderEl) loaderEl.classList.add('show');
-  try {
-    Object.assign(S, await api('bootstrap'));
-    renderAll();
-  } catch (x) {
-    alert(x.message);
-  } finally {
-    if (loaderEl) loaderEl.classList.remove('show');
+/* ---------- Carga de datos ---------- */
+async function cargarDatos(){
+  if(API_URL.indexOf("PEGAR_ACA") === 0 || API_URL.includes("PEGAR_ACA")){
+    document.getElementById("config-note").style.display = "block";
+    return;
+  }
+  document.getElementById("config-note").style.display = "none";
+  try{
+    const [resList, resResumen] = await Promise.all([
+      fetch(`${API_URL}?action=list`).then(r=>r.json()),
+      fetch(`${API_URL}?action=resumen`).then(r=>r.json())
+    ]);
+    if(!resList.ok) throw new Error(resList.error);
+    DATA = resList.data;
+    pintarTabla();
+    pintarKpis(resResumen.ok ? resResumen.data : null);
+    document.getElementById("ultima-actualizacion").textContent =
+      "actualizado " + new Date().toLocaleString("es-AR");
+  }catch(err){
+    mostrarToast("Error al cargar datos: " + err.message, true);
   }
 }
 
-function showView(v) {
-  S.view = v;
-  document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === 'v-' + v));
-  document.querySelectorAll('.nav button').forEach(x => x.classList.toggle('active', x.id === 'n-' + v));
-}
-
-function renderAll() {
-  renderStats();
-  home();
-  renderRentals();
-  alerts();
-  showView(S.view);
-}
-
-function renderStats() {
-  let x = S.indicadores, a = [['Registros activos', x.total], ['Vigentes', x.vigentes], ['Próximos · 90 días', x.proximos], ['Vencidos', x.vencidos], ['Doc. pendientes', x.pendientes]];
-  let statsContainer = document.getElementById('stats');
-  if (statsContainer) {
-    statsContainer.innerHTML = a.map(z => `<div class="stat"><span>${z[0]}</span><b>${z[1] ?? 0}</b></div>`).join('');
+function pintarKpis(resumen){
+  if(!resumen){
+    // fallback: calcular desde DATA
+    const activos = DATA.filter(r=>r["Estado Trámite"]!=="DE BAJA");
+    resumen = {
+      total_inmuebles: DATA.length,
+      activos: activos.length,
+      vencidos: DATA.filter(r=>r["Estado Vigencia"]==="VENCIDO").length,
+      por_vencer: DATA.filter(r=>r["Estado Vigencia"]==="POR VENCER").length,
+      monto_total_mensual: activos.reduce((s,r)=>s+(Number(r["Monto Actual ($)"])||0),0)
+    };
   }
-  const countEl = document.getElementById('count');
-  const heroMoneyEl = document.getElementById('heroMoney');
-  const lg1El = document.getElementById('lg1');
-  const lg2El = document.getElementById('lg2');
-  const lg3El = document.getElementById('lg3');
-
-  if (countEl) countEl.textContent = S.alertas.length;
-  if (heroMoneyEl) heroMoneyEl.textContent = m(x.monto);
-  if (lg1El) lg1El.textContent = (x.vigentes || 0) + ' vigentes';
-  if (lg2El) lg2El.textContent = (x.proximos || 0) + ' próximos';
-  if (lg3El) lg3El.textContent = (x.vencidos || 0) + ' vencidos';
+  document.getElementById("kpi-total").textContent = resumen.total_inmuebles;
+  document.getElementById("kpi-activos").textContent = resumen.activos;
+  document.getElementById("kpi-vencidos").textContent = resumen.vencidos;
+  document.getElementById("kpi-porvencer").textContent = resumen.por_vencer;
+  document.getElementById("kpi-monto").textContent = formatoMoneda(resumen.monto_total_mensual);
 }
 
-function home() {
-  let item = x => `<div class="item"><i class="dot"></i><div><b>${e(x.TIPO_ALERTA || x.SERVICIO)}</b><br><small>${e(x.MENSAJE || ('Vence ' + d(x.FECHA_FIN)))}</small></div><button class="secondary" onclick="verHistorial('${x.ID_ALQUILER}')">Ver</button></div>`;
-  const homeAlertsEl = document.getElementById('homeAlerts');
-  const soonEl = document.getElementById('soon');
-
-  if (homeAlertsEl) {
-    homeAlertsEl.innerHTML = S.alertas.length ? S.alertas.slice(0, 6).map(item).join('') : '<div class="empty">No hay alertas.</div>';
-  }
-  let a = S.alquileres.filter(x => x.ACTIVO === 'SI' && x.ESTADO_VIGENCIA === 'PROXIMO VENCIMIENTO');
-  if (soonEl) {
-    soonEl.innerHTML = a.length ? a.map(item).join('') : '<div class="empty">No hay vencimientos próximos.</div>';
-  }
-}
-
-function filtered() {
-  const qEl = document.getElementById('q');
-  const fvEl = document.getElementById('fv');
-  const faEl = document.getElementById('fa');
-  let x = qEl ? qEl.value.toLowerCase() : '';
-  let fvVal = fvEl ? fvEl.value : '';
-  let faVal = faEl ? faEl.value : '';
-
-  return S.alquileres.filter(r => r.ACTIVO === 'SI' && (!fvVal || r.ESTADO_VIGENCIA === fvVal) && (!faVal || r.ESTADO_ADMINISTRATIVO === faVal) && (!x || [r.ID_ALQUILER, r.SERVICIO, r.DOMICILIO, r.LOCADOR, r.N_EXPEDIENTE_RESOLUCION].join(' ').toLowerCase().includes(x)));
-}
-
-function goRentals(v) {
-  showView('alquileres');
-  const fvEl = document.getElementById('fv');
-  if (fvEl) fvEl.value = v || '';
-  renderRentals();
-}
-
-function renderRentals() {
-  let a = filtered();
-  const resultEl = document.getElementById('result');
-  const rowsEl = document.getElementById('rows');
-
-  if (resultEl) resultEl.textContent = a.length + ' alquiler(es)';
-  if (rowsEl) {
-    rowsEl.innerHTML = a.map(r => `<tr onclick="verHistorial('${r.ID_ALQUILER}')"><td><b>${e(r.SERVICIO)}</b><br><small>${e(r.DOMICILIO || '')}</small></td><td>${e(r.N_EXPEDIENTE_RESOLUCION || '—')}</td><td>${e(r.LOCADOR || '—')}</td><td>${d(r.FECHA_FIN)}</td><td>${m(r.MONTO_MENSUAL)}</td><td>${tag(r.ESTADO_VIGENCIA)}</td><td>${tag(r.DOCUMENTACION)}</td><td class="actions"><button onclick="event.stopPropagation();openForm('${r.ID_ALQUILER}')">Editar</button><button class="danger" onclick="event.stopPropagation();removeRecord('${r.ID_ALQUILER}')">Baja</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">Sin resultados.</td></tr>';
-  }
-}
-
-function alerts() {
-  const alertRowsEl = document.getElementById('alertRows');
-  if (alertRowsEl) {
-    alertRowsEl.innerHTML = S.alertas.map(a => {
-      let r = S.alquileres.find(x => x.ID_ALQUILER === a.ID_ALQUILER) || {};
-      return `<tr><td>${tag(a.PRIORIDAD)}</td><td>${e(a.TIPO_ALERTA)}</td><td>${e(a.MENSAJE)}</td><td>${e(r.SERVICIO || a.ID_ALQUILER)}</td><td><button class="secondary" onclick="goRentals();document.getElementById('q').value='${a.ID_ALQUILER}';renderRentals()">Ir al alquiler</button></td></tr>`;
-    }).join('') || '<tr><td colspan="5" class="empty">No hay alertas.</td></tr>';
-  }
-}
-
-function hideModal(x) {
-  const el = document.getElementById(x);
-  if (el) el.classList.remove('show');
-}
-
-function openForm(id) {
-  let r = id ? S.alquileres.find(x => x.ID_ALQUILER === id) : { ACTIVO: 'SI', DOCUMENTACION: 'PENDIENTE DE RELEVAR', ESTADO_ADMINISTRATIVO: 'SIN ESTADO' }, h = '';
-  F.forEach(([k, l, t, ro, c, o]) => {
-    let v = r[k] ?? '', z = t === 'select' ? `<select name="${k}">${o.map(x => `<option ${x === v ? 'selected' : ''}>${x}</option>`).join('')}</select>` : t === 'textarea' ? `<textarea name="${k}">${e(v)}</textarea>` : `<input type="${t || 'text'}" name="${k}" ${ro ? 'readonly' : ''} value="${e(t === 'date' ? String(v).slice(0, 10) : v)}">`;
-    h += `<label class="${c || ''}">${l}${z}</label>`;
-  });
-  const fieldsEl = document.getElementById('fields');
-  const ftEl = document.getElementById('ft');
-  const fmEl = document.getElementById('fm');
-
-  if (fieldsEl) fieldsEl.innerHTML = h;
-  if (ftEl) ftEl.textContent = id ? 'Editar alquiler' : 'Nuevo alquiler';
-  if (fmEl) fmEl.classList.add('show');
-}
-
-async function save(ev) {
-  ev.preventDefault();
-  let r = Object.fromEntries(new FormData(ev.target));
-  r.N_INTERNO = +r.N_INTERNO || '';
-  r.MONTO_MENSUAL = +r.MONTO_MENSUAL || '';
-  try {
-    await api('save', { record: r });
-    hideModal('fm');
-    loadApp();
-  } catch (x) {
-    alert(x.message);
-  }
-}
-
-async function removeRecord(id) {
-  if (confirm('¿Dar de baja? Quedará en el historial.')) try {
-    await api('delete', { id });
-    loadApp();
-  } catch (x) {
-    alert(x.message);
-  }
-}
-
-async function verHistorial(id) {
-  let r = S.alquileres.find(x => x.ID_ALQUILER === id);
-  if (!r) return;
-  
-  const htEl = document.getElementById('ht');
-  const hsEl = document.getElementById('hs');
-  const hcEl = document.getElementById('hc');
-  const heEl = document.getElementById('he');
-  const hmEl = document.getElementById('hm');
-
-  if (htEl) htEl.textContent = r.SERVICIO;
-  if (hsEl) hsEl.textContent = r.ID_ALQUILER + ' · ' + (r.DOMICILIO || '');
-  if (hcEl) hcEl.innerHTML = '<div class="empty">Cargando historial…</div>';
-  if (heEl) heEl.onclick = () => { hideModal('hm'); openForm(id); };
-  if (hmEl) hmEl.classList.add('show');
-
-  try {
-    let a = await api('history', { id }), z = [['Expediente', r.N_EXPEDIENTE_RESOLUCION], ['Locador', r.LOCADOR], ['Monto', m(r.MONTO_MENSUAL)], ['Vigencia', r.ESTADO_VIGENCIA], ['Fin', d(r.FECHA_FIN)], ['Documentación', r.DOCUMENTACION], ['Seguimiento', r.SEGUIMIENTO_EXPEDIENTE], ['Drive', r.LINK_DRIVE ? `<a href="${e(r.LINK_DRIVE)}" target="_blank">Abrir</a>` : 'Sin enlace']];
-    if (hcEl) {
-      hcEl.innerHTML = `<div class="details">${z.map(x => `<div><span>${x[0]}</span><b>${x[1] || '—'}</b></div>`).join('')}</div><h3>Historial de movimientos</h3>${a.length ? a.map(x => `<div class="move"><b>${e(x.OPERACION)} · ${e(x.CAMPO)}</b><br><small>${d(x.FECHA_HORA)} · ${e(x.USUARIO || 'Webapp')}</small><div>${e(x.VALOR_ANTERIOR || '—')} → ${e(x.VALOR_NUEVO || '—')}</div></div>`).join('') : '<div class="empty">Todavía no hay movimientos registrados.</div>'}`;
+function filasFiltradas(){
+  const q = document.getElementById("buscador").value.trim().toLowerCase();
+  const estado = document.getElementById("filtro-estado").value;
+  return DATA.filter(r=>{
+    if(FILTRO_VIGENCIA && r["Estado Vigencia"] !== FILTRO_VIGENCIA) return false;
+    if(estado && r["Estado Trámite"] !== estado) return false;
+    if(q){
+      const texto = [r["Servicio / Efector"], r["Domicilio"], r["Locador"], r["Expediente"]]
+        .join(" ").toLowerCase();
+      if(!texto.includes(q)) return false;
     }
-  } catch (x) {
-    if (hcEl) hcEl.innerHTML = '<div class="empty">No se pudo cargar el historial.</div>';
+    return true;
+  });
+}
+
+function pintarTabla(){
+  const filas = filasFiltradas();
+  const tbody = document.getElementById("tbody-alquileres");
+  if(filas.length === 0){
+    tbody.innerHTML = `<tr><td colspan="10" class="vacio"><div class="icono">🔍</div>No hay alquileres que coincidan con el filtro.</td></tr>`;
+    return;
   }
+  tbody.innerHTML = filas.map(r => `
+    <tr>
+      <td>${r["ID"]}</td>
+      <td>${r["Servicio / Efector"] || "—"}</td>
+      <td>${r["Domicilio"] || "—"}</td>
+      <td>${r["Locador"] || "—"}</td>
+      <td>${r["Expediente"] || "—"}</td>
+      <td>${formatoFecha(r["Fecha Fin"])}</td>
+      <td class="num">${formatoMoneda(r["Monto Actual ($)"])}</td>
+      <td>${r["Estado Trámite"] || "—"}</td>
+      <td>${badgeVigencia(r["Estado Vigencia"], r["Días para Vencer"])}</td>
+      <td class="acciones">
+        <button class="btn btn-sm" onclick="abrirEdicion(${r["ID"]})">✎ Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="darDeBaja(${r["ID"]})">Baja</button>
+      </td>
+    </tr>
+  `).join("");
 }
 
-function exportExcel() {
-  let a = filtered(), c = ['ID_ALQUILER', 'N_EXPEDIENTE_RESOLUCION', 'SERVICIO', 'DOMICILIO', 'LOCADOR', 'FECHA_FIN', 'MONTO_MENSUAL', 'ESTADO_VIGENCIA'], t = '<table><tr>' + c.map(x => '<th>' + x + '</th>').join('') + '</tr>' + a.map(r => '<tr>' + c.map(x => '<td>' + e(r[x]) + '</td>').join('') + '</tr>').join('') + '</table>', b = new Blob(['﻿' + t], { type: 'application/vnd.ms-excel' }), x = document.createElement('a');
-  x.href = URL.createObjectURL(b);
-  x.download = 'alquileres_filtrados.xls';
-  x.click();
-}
+/* ---------- Filtros ---------- */
+document.getElementById("buscador").addEventListener("input", pintarTabla);
+document.getElementById("filtro-estado").addEventListener("change", pintarTabla);
+document.querySelectorAll(".pill").forEach(p=>{
+  p.addEventListener("click", ()=>{
+    document.querySelectorAll(".pill").forEach(x=>x.classList.remove("activo"));
+    p.classList.add("activo");
+    FILTRO_VIGENCIA = p.dataset.vig;
+    pintarTabla();
+  });
+});
 
-loadApp();
+/* ---------- Modal alta/edición ---------- */
+const modalBg = document.getElementById("modal-bg");
+function abrirModal(titulo){
+  document.getElementById("modal-titulo").textContent = titulo;
+  modalBg.classList.add("abierto");
+}
+function cerrarModal(){
+  modalBg.classList.remove("abierto");
+  ["f-id","f-servicio","f-domicilio","f-locador","f-expediente","f-indice",
+   "f-fecha-inicio","f-fecha-fin","f-monto","f-estado"].forEach(id=>document.getElementById(id).value="");
+}
+document.getElementById("btn-cerrar-modal").onclick = cerrarModal;
+document.getElementById("btn-cancelar-modal").onclick = cerrarModal;
+document.getElementById("btn-nuevo").onclick = ()=>abrirModal("Nuevo alquiler");
+
+window.abrirEdicion = function(id){
+  const r = DATA.find(x=>Number(x["ID"])===Number(id));
+  if(!r) return;
+  document.getElementById("f-id").value = r["ID"];
+  document.getElementById("f-servicio").value = r["Servicio / Efector"] || "";
+  document.getElementById("f-domicilio").value = r["Domicilio"] || "";
+  document.getElementById("f-locador").value = r["Locador"] || "";
+  document.getElementById("f-expediente").value = r["Expediente"] || "";
+  document.getElementById("f-indice").value = r["Índice Actualización"] || "";
+  document.getElementById("f-fecha-inicio").value = r["Fecha Inicio"] || "";
+  document.getElementById("f-fecha-fin").value = r["Fecha Fin"] || "";
+  document.getElementById("f-monto").value = r["Monto Actual ($)"] || "";
+  document.getElementById("f-estado").value = r["Estado Trámite"] || "";
+  abrirModal("Editar alquiler #" + id);
+};
+
+window.darDeBaja = async function(id){
+  if(!confirm("¿Confirmás dar de baja este alquiler? Queda registrado en el log y no se borra el historial.")) return;
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      body: JSON.stringify({ action:"delete", id, usuario: USUARIO_ACTUAL })
+    }).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    mostrarToast("Alquiler dado de baja.");
+    cargarDatos();
+  }catch(err){ mostrarToast("Error: " + err.message, true); }
+};
+
+document.getElementById("btn-guardar-modal").onclick = async ()=>{
+  const id = document.getElementById("f-id").value;
+  const data = {
+    servicio_efector: document.getElementById("f-servicio").value,
+    domicilio: document.getElementById("f-domicilio").value,
+    locador: document.getElementById("f-locador").value,
+    expediente: document.getElementById("f-expediente").value,
+    indice_actualizacion: document.getElementById("f-indice").value,
+    fecha_inicio: document.getElementById("f-fecha-inicio").value,
+    fecha_fin: document.getElementById("f-fecha-fin").value,
+    monto_actual: document.getElementById("f-monto").value,
+    estado_tramite: document.getElementById("f-estado").value
+  };
+  try{
+    const payload = id
+      ? { action:"update", id: Number(id), data, usuario: USUARIO_ACTUAL }
+      : { action:"create", data, usuario: USUARIO_ACTUAL };
+    const res = await fetch(API_URL, { method:"POST", body: JSON.stringify(payload) }).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    mostrarToast(id ? "Alquiler actualizado." : "Alquiler creado.");
+    cerrarModal();
+    cargarDatos();
+  }catch(err){ mostrarToast("Error: " + err.message, true); }
+};
+
+/* ---------- Botones superiores ---------- */
+document.getElementById("btn-refrescar").onclick = cargarDatos;
+
+document.getElementById("btn-exportar-excel").onclick = ()=>{
+  const filas = filasFiltradas();
+  if(filas.length===0){ mostrarToast("No hay datos para exportar.", true); return; }
+  const ws = XLSX.utils.json_to_sheet(filas);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Alquileres");
+  XLSX.writeFile(wb, `alquileres_siprosa_${new Date().toISOString().slice(0,10)}.xlsx`);
+};
+
+document.getElementById("btn-exportar-pdf").onclick = ()=>{
+  const filas = filasFiltradas();
+  if(filas.length===0){ mostrarToast("No hay datos para exportar.", true); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:"landscape" });
+  doc.setFontSize(13);
+  doc.text("SIPROSA · Listado de Alquileres", 14, 14);
+  doc.setFontSize(9);
+  doc.text("Generado: " + new Date().toLocaleString("es-AR"), 14, 20);
+  doc.autoTable({
+    startY: 26,
+    styles:{ fontSize:8 },
+    headStyles:{ fillColor:[11,31,42] },
+    head:[["ID","Servicio/Efector","Domicilio","Locador","Expediente","Fin contrato","Monto","Estado","Vigencia"]],
+    body: filas.map(r=>[
+      r["ID"], r["Servicio / Efector"], r["Domicilio"], r["Locador"], r["Expediente"],
+      formatoFecha(r["Fecha Fin"]), formatoMoneda(r["Monto Actual ($)"]),
+      r["Estado Trámite"] || "—", r["Estado Vigencia"] || "—"
+    ])
+  });
+  doc.save(`alquileres_siprosa_${new Date().toISOString().slice(0,10)}.pdf`);
+};
+
+/* ---------- Inicio ---------- */
+cargarDatos();
 </script>
 </body>
 </html>
