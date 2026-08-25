@@ -917,8 +917,6 @@ window.abrirDetalle = async function(id){
       ocultarCargando();
     }
   }
-  pintarEvolucionMontos(id, historialMontos);
-
   const body = document.getElementById("detalle-body");
   body.innerHTML = `
     <div class="detalle-grid">
@@ -949,6 +947,7 @@ window.abrirDetalle = async function(id){
           ${documentacion.map(d=>`<tr><td data-label="Observación">${d["Observación / Estado"]||"—"}</td><td data-label="Seguimiento">${d["Seguimiento"]||"—"}</td></tr>`).join("")}
         </tbody></table>`}
   `;
+  pintarEvolucionMontos(id, historialMontos);
   modalDetalleBg.classList.add("abierto");
 };
 document.getElementById("btn-cerrar-detalle").onclick = ()=>modalDetalleBg.classList.remove("abierto");
