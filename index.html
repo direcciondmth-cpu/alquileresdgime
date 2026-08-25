@@ -265,6 +265,26 @@ td.acciones{display:flex;gap:6px;}
 }
 .tag-h3{font-family:var(--serif);font-size:15px;margin:18px 0 8px;color:var(--azul-950);}
 
+/* ---- Evolución de montos ---- */
+.resumen-evolucion{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.chip-evolucion{
+  flex:1 1 140px;background:#fff;border:1px solid var(--linea);padding:10px 12px;text-align:center;
+}
+.chip-evolucion .lbl{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;color:var(--tinta-suave);letter-spacing:.04em;}
+.chip-evolucion .val{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--azul-950);margin-top:3px;}
+.chip-evolucion.subida .val{color:var(--rojo);}
+.chip-evolucion.subida .val::before{content:"▲ ";font-size:12px;}
+.mini-barras{margin-bottom:10px;}
+.mini-fila{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11.5px;}
+.mini-fila .mini-fecha{flex:0 0 78px;font-family:var(--mono);font-size:10px;color:var(--tinta-suave);}
+.mini-fila .mini-track{flex:1;background:#e4e7e0;height:16px;border-radius:3px;position:relative;overflow:hidden;}
+.mini-fila .mini-fill{height:100%;background:var(--teal-1);border-radius:3px;}
+.mini-fila .mini-monto{flex:0 0 auto;font-family:var(--mono);font-size:11px;font-weight:600;min-width:76px;text-align:right;}
+.form-monto-manual{display:none;background:#fff;border:1px solid var(--linea);padding:12px;margin-top:8px;}
+.form-monto-manual.abierto{display:block;}
+.form-monto-manual .grid3{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px;margin-bottom:8px;}
+@media(max-width:560px){ .form-monto-manual .grid3{grid-template-columns:1fr;} }
+
 .toast{position:fixed;bottom:22px;right:22px;background:var(--azul-950);color:#fff;padding:12px 18px;border-radius:var(--radio);font-size:13px;z-index:100;box-shadow:0 6px 18px rgba(0,0,0,.25);display:none;border-left:4px solid var(--teal-2);}
 .toast.error{border-left-color:var(--rojo);}
 .toast.mostrar{display:block;animation:aparecer .2s ease;}
@@ -539,7 +559,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbyy9m7V68HkjGOVAXskzqhUG7AuY26xFxGcrxnrwmyw1ji4asEAmnBET9eDLVTyA4dJ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxH-Xlr4GJ3FdD2crZb7BzG2O8gaRD3tk1nV9V6R6Bp_qXE_KBCfPqu0P_ro5XpwOLq/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
@@ -880,20 +900,24 @@ window.abrirDetalle = async function(id){
 
   let historial = [];
   let documentacion = [];
+  let historialMontos = [];
   if(!API_URL.includes("PEGAR_ACA")){
     mostrarCargando("Buscando historial del inmueble…");
     try{
-      const [rh, rd] = await Promise.all([
+      const [rh, rd, rm] = await Promise.all([
         fetch(`${API_URL}?action=historial&id=${id}`).then(x=>x.json()),
-        fetch(`${API_URL}?action=documentacion&id=${id}`).then(x=>x.json())
+        fetch(`${API_URL}?action=documentacion&id=${id}`).then(x=>x.json()),
+        fetch(`${API_URL}?action=historial_montos&id=${id}`).then(x=>x.json())
       ]);
       if(rh.ok) historial = rh.data;
       if(rd.ok) documentacion = rd.data;
+      if(rm.ok) historialMontos = rm.data;
     }catch(e){ /* silencioso: se muestra igual el detalle base */
     }finally{
       ocultarCargando();
     }
   }
+  pintarEvolucionMontos(id, historialMontos);
 
   const body = document.getElementById("detalle-body");
   body.innerHTML = `
@@ -907,6 +931,9 @@ window.abrirDetalle = async function(id){
       <div class="detalle-item"><label>Monto actual</label><div class="val">${formatoMoneda(r["Monto Actual ($)"])}</div></div>
       <div class="detalle-item"><label>Vigencia</label><div class="val">${badgeVigencia(r["Estado Vigencia"], r["Días para Vencer"])}</div></div>
     </div>
+
+    <div class="tag-h3">Evolución del monto pagado</div>
+    <div id="bloque-evolucion-montos"><div class="vacio-panel" style="background:#fff;border:1px solid var(--linea);">Cargando…</div></div>
 
     <div class="tag-h3">Historial de contratos anteriores</div>
     ${historial.length===0
@@ -929,6 +956,81 @@ document.getElementById("btn-cerrar-detalle-2").onclick = ()=>modalDetalleBg.cla
 document.getElementById("btn-editar-desde-detalle").onclick = ()=>{
   modalDetalleBg.classList.remove("abierto");
   abrirEdicion(ID_DETALLE_ACTUAL);
+};
+
+/* ---------- Evolución de montos (dentro del modal de detalle) ---------- */
+function pintarEvolucionMontos(idInmueble, filas){
+  const cont = document.getElementById("bloque-evolucion-montos");
+  if(!filas || filas.length===0){
+    cont.innerHTML = `
+      <div class="vacio-panel" style="background:#fff;border:1px solid var(--linea);">Todavía no hay montos históricos cargados para este inmueble.</div>
+      <button class="btn btn-sm" style="margin-top:8px;" onclick="toggleFormMonto()">+ Cargar un monto anterior</button>
+      ${formMontoManualHtml(idInmueble)}`;
+    return;
+  }
+
+  const primero = filas[0];
+  const ultimo = filas[filas.length-1];
+  const montoInicial = Number(primero["Monto ($)"]) || 0;
+  const montoActual = Number(ultimo["Monto ($)"]) || 0;
+  const variacion = montoInicial > 0 ? ((montoActual - montoInicial) / montoInicial * 100) : 0;
+  const max = Math.max(...filas.map(f=>Number(f["Monto ($)"])||0), 1);
+
+  cont.innerHTML = `
+    <div class="resumen-evolucion">
+      <div class="chip-evolucion"><div class="lbl">Empezó pagando</div><div class="val">${formatoMoneda(montoInicial)}</div></div>
+      <div class="chip-evolucion"><div class="lbl">Paga actualmente</div><div class="val">${formatoMoneda(montoActual)}</div></div>
+      <div class="chip-evolucion ${variacion>0?'subida':''}"><div class="lbl">Variación total</div><div class="val">${variacion.toFixed(0)}%</div></div>
+    </div>
+    <div class="mini-barras">
+      ${filas.map(f=>{
+        const m = Number(f["Monto ($)"])||0;
+        const pct = max>0 ? (m/max*100) : 0;
+        const fecha = formatoFecha(f["Fecha Desde"]) !== "—" ? formatoFecha(f["Fecha Desde"]) : (f["Fecha Desde"]||"—");
+        return `<div class="mini-fila" title="${f["Motivo / Concepto"]||''}">
+          <div class="mini-fecha">${fecha}</div>
+          <div class="mini-track"><div class="mini-fill" style="width:${pct}%"></div></div>
+          <div class="mini-monto">${formatoMoneda(m)}</div>
+        </div>`;
+      }).join("")}
+    </div>
+    <button class="btn btn-sm" onclick="toggleFormMonto()">+ Cargar un monto anterior</button>
+    ${formMontoManualHtml(idInmueble)}
+  `;
+}
+
+function formMontoManualHtml(idInmueble){
+  return `
+    <div class="form-monto-manual" id="form-monto-manual">
+      <div class="grid3">
+        <div class="campo" style="margin-bottom:0;"><label>Vigente desde</label><input type="date" id="fm-fecha"></div>
+        <div class="campo" style="margin-bottom:0;"><label>Monto ($)</label><input type="number" step="0.01" id="fm-monto"></div>
+        <div class="campo" style="margin-bottom:0;"><label>Motivo</label><input type="text" id="fm-motivo" placeholder="Ej: actualización semestral"></div>
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="guardarMontoManual(${idInmueble})">Guardar</button>
+    </div>`;
+}
+window.toggleFormMonto = function(){
+  const f = document.getElementById("form-monto-manual");
+  if(f) f.classList.toggle("abierto");
+};
+window.guardarMontoManual = async function(idInmueble){
+  const fecha = document.getElementById("fm-fecha").value;
+  const monto = document.getElementById("fm-monto").value;
+  const motivo = document.getElementById("fm-motivo").value || "Carga manual";
+  if(!monto){ mostrarToast("Ingresá un monto.", true); return; }
+  mostrarCargando("Guardando monto histórico…");
+  try{
+    const res = await fetch(API_URL, { method:"POST", body: JSON.stringify({
+      action:"add_historial_monto",
+      data:{ id_inmueble: idInmueble, fecha_desde: fecha, monto, motivo },
+      usuario: USUARIO_ACTUAL
+    })}).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    mostrarToast("Monto agregado a la evolución.");
+    abrirDetalle(idInmueble); // recarga el modal con el dato nuevo
+  }catch(err){ mostrarToast("Error: " + err.message, true); }
+  finally{ ocultarCargando(); }
 };
 
 /* ---------- Modal alta/edición ---------- */
