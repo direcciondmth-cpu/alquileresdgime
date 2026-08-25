@@ -358,6 +358,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
       <button class="activo" data-vista="inicio">Inicio</button>
       <button data-vista="alquileres">Alquileres</button>
       <button data-vista="alertas">Alertas</button>
+      <button data-vista="enlaces">Enlaces</button>
       <button data-vista="config">Configuración</button>
     </nav>
 
@@ -456,6 +457,28 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     <h2 class="section-title">Alertas</h2>
     <p class="section-sub">Vencimientos, trámites pendientes y documentación incompleta. Hacé clic en un ítem para abrir el alquiler.</p>
     <div id="contenedor-alertas"><div class="vacio">Cargando alertas…</div></div>
+  </section>
+
+  <!-- ======================= VISTA: ENLACES ======================= -->
+  <section class="vista" id="vista-enlaces">
+    <p class="eyebrow">Herramientas externas</p>
+    <h2 class="section-title">Enlaces útiles</h2>
+    <p class="section-sub">Calculadora de alquileres para apoyar el análisis y la actualización de contratos.</p>
+
+    <div class="panel" style="padding:16px;">
+      <div class="panel-head" style="margin:-16px -16px 16px;">
+        <h3>Calculadora de alquileres · Arquiler</h3>
+        <a class="verlink" href="https://arquiler.com/mini?theme=light&amp;backgroundColor=ffffff" target="_blank" rel="noopener">Abrir en otra pestaña ↗</a>
+      </div>
+      <iframe
+        title="Calculadora de alquileres"
+        src="https://arquiler.com/mini?theme=light&amp;backgroundColor=ffffff"
+        width="800"
+        height="600"
+        style="display:block;width:100%;max-width:100%;height:600px;border:1px solid var(--linea);border-radius:var(--radio);background:#fff;"
+        loading="lazy">
+      </iframe>
+    </div>
   </section>
 
   <!-- ======================= VISTA: CONFIGURACIÓN ======================= -->
