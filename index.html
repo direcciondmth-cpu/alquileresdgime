@@ -1100,7 +1100,7 @@ function fechaParaEditar(valor){
 async function guardarCambioHistorico(accion, id, data, idInmueble, mensaje){
   mostrarCargando(mensaje);
   try{
-    const res = await fetch(API_URL, {method:"POST", body:JSON.stringify({action, id, data, usuario:USUARIO_ACTUAL})}).then(r=>r.json());
+    const res = await fetch(API_URL, {method:"POST", body:JSON.stringify({action:accion, id, data, usuario:USUARIO_ACTUAL})}).then(r=>r.json());
     if(!res.ok) throw new Error(res.error || "No se pudo guardar el cambio.");
     mostrarToast("Cambio guardado.");
     abrirDetalle(idInmueble);
