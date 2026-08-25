@@ -338,6 +338,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
       <button class="activo" data-vista="inicio">Inicio</button>
       <button data-vista="alquileres">Alquileres</button>
       <button data-vista="alertas">Alertas</button>
+      <button data-vista="config">Configuración</button>
     </nav>
 
     <div class="top-actions">
@@ -437,6 +438,32 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     <div id="contenedor-alertas"><div class="vacio">Cargando alertas…</div></div>
   </section>
 
+  <!-- ======================= VISTA: CONFIGURACIÓN ======================= -->
+  <section class="vista" id="vista-config">
+    <p class="eyebrow">Módulo</p>
+    <h2 class="section-title">Configuración de correos</h2>
+    <p class="section-sub">Estas direcciones reciben, de lunes a viernes, un resumen automático con vencidos, próximos a vencer y monto total. Los cambios se guardan directo en la base.</p>
+
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="panel-head">
+        <h3>Destinatarios</h3>
+        <button class="btn btn-sm btn-primary" id="btn-enviar-prueba">✉ Enviar prueba ahora</button>
+      </div>
+      <div style="padding:14px;">
+        <div class="grid2" style="grid-template-columns:2fr 1.3fr auto;align-items:end;">
+          <div class="campo" style="margin-bottom:0;"><label>Correo</label><input type="text" id="f-correo-nuevo" placeholder="nombre@organismo.gob.ar"></div>
+          <div class="campo" style="margin-bottom:0;"><label>Alias (opcional)</label><input type="text" id="f-alias-nuevo" placeholder="Jefe Dpto. Alquileres"></div>
+          <button class="btn btn-primary" id="btn-agregar-correo" style="height:38px;">+ Agregar</button>
+        </div>
+      </div>
+      <div id="lista-correos"><div class="vacio-panel">Cargando destinatarios…</div></div>
+    </div>
+
+    <div class="config-note" style="margin-bottom:0;">
+      ℹ El envío automático hay que activarlo una sola vez desde el editor de Apps Script (función <code>crearTriggerDiario</code>). Ver instrucciones dentro de <code>Codigo_AppsScript.gs</code>.
+    </div>
+  </section>
+
 </main>
 
 <footer>SIPROSA · Panel de gestión de alquileres · uso interno</footer>
@@ -512,7 +539,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbxQO2N20rfuLerXgAniROfsP9Zdpp0fRL1Fwt10RhgkvKDuWxFfVGXCVfgfXn3AxqA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyy9m7V68HkjGOVAXskzqhUG7AuY26xFxGcrxnrwmyw1ji4asEAmnBET9eDLVTyA4dJ/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
@@ -601,6 +628,7 @@ async function cargarDatos(){
     pintarKpis(resResumen.ok ? resResumen.data : null);
     pintarInicio();
     pintarAlertas(resAlertas.ok ? resAlertas.data : null);
+    cargarCorreos();
     document.getElementById("ultima-actualizacion").textContent =
       "Dirección de Recursos Físicos · actualizado " + new Date().toLocaleString("es-AR");
   }catch(err){
@@ -609,6 +637,89 @@ async function cargarDatos(){
     ocultarCargando();
   }
 }
+
+/* ---------- Módulo Configuración: correos ---------- */
+async function cargarCorreos(){
+  const cont = document.getElementById("lista-correos");
+  try{
+    const res = await fetch(`${API_URL}?action=config_correos`).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    pintarCorreos(res.data);
+  }catch(err){
+    cont.innerHTML = `<div class="vacio-panel">No se pudo cargar la lista de correos.</div>`;
+  }
+}
+
+function pintarCorreos(correos){
+  const cont = document.getElementById("lista-correos");
+  if(!correos || correos.length===0){
+    cont.innerHTML = `<div class="vacio-panel">Todavía no hay destinatarios cargados.</div>`;
+    return;
+  }
+  cont.innerHTML = `<ul class="lista-simple">` + correos.map(c => `
+    <li style="cursor:default;">
+      <div>
+        <div class="titulo-item">${c.email}</div>
+        <div class="sub-item">${c.alias || "sin alias"} · ${c.activo ? "🟢 activo" : "⚪ pausado"}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm" onclick="toggleCorreo('${c.email}', ${!c.activo})">${c.activo ? "Pausar" : "Activar"}</button>
+        <button class="btn btn-sm btn-danger" onclick="borrarCorreo('${c.email}')">Borrar</button>
+      </div>
+    </li>`).join("") + `</ul>`;
+}
+
+document.getElementById("btn-agregar-correo").onclick = async ()=>{
+  const email = document.getElementById("f-correo-nuevo").value.trim();
+  const alias = document.getElementById("f-alias-nuevo").value.trim();
+  if(!email || email.indexOf("@")===-1){ mostrarToast("Ingresá un correo válido.", true); return; }
+  const btn = document.getElementById("btn-agregar-correo");
+  btn.classList.add("cargando");
+  try{
+    const res = await fetch(API_URL, { method:"POST", body: JSON.stringify({ action:"add_correo", email, alias, usuario: USUARIO_ACTUAL }) }).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    document.getElementById("f-correo-nuevo").value = "";
+    document.getElementById("f-alias-nuevo").value = "";
+    mostrarToast("Correo agregado.");
+    cargarCorreos();
+  }catch(err){ mostrarToast("Error: " + err.message, true); }
+  finally{ btn.classList.remove("cargando"); }
+};
+
+window.toggleCorreo = async function(email, activo){
+  try{
+    const res = await fetch(API_URL, { method:"POST", body: JSON.stringify({ action:"toggle_correo", email, activo, usuario: USUARIO_ACTUAL }) }).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    mostrarToast(activo ? "Correo activado." : "Correo pausado.");
+    cargarCorreos();
+  }catch(err){ mostrarToast("Error: " + err.message, true); }
+};
+
+window.borrarCorreo = async function(email){
+  if(!confirm(`¿Quitar ${email} de la lista de destinatarios?`)) return;
+  try{
+    const res = await fetch(API_URL, { method:"POST", body: JSON.stringify({ action:"delete_correo", email, usuario: USUARIO_ACTUAL }) }).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    mostrarToast("Correo eliminado.");
+    cargarCorreos();
+  }catch(err){ mostrarToast("Error: " + err.message, true); }
+};
+
+document.getElementById("btn-enviar-prueba").onclick = async ()=>{
+  const btn = document.getElementById("btn-enviar-prueba");
+  btn.classList.add("cargando");
+  mostrarCargando("Enviando correo de prueba…");
+  try{
+    const res = await fetch(API_URL, { method:"POST", body: JSON.stringify({ action:"enviar_resumen_ahora", usuario: USUARIO_ACTUAL }) }).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    if(res.data.enviado){
+      mostrarToast("Correo de prueba enviado a " + res.data.destinatarios.length + " destinatario(s).");
+    }else{
+      mostrarToast(res.data.motivo || "No se envió.", true);
+    }
+  }catch(err){ mostrarToast("Error: " + err.message, true); }
+  finally{ btn.classList.remove("cargando"); ocultarCargando(); }
+};
 
 function pintarKpis(resumen){
   if(!resumen){
