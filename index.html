@@ -559,7 +559,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbxH-Xlr4GJ3FdD2crZb7BzG2O8gaRD3tk1nV9V6R6Bp_qXE_KBCfPqu0P_ro5XpwOLq/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzNCTZhMf_K4es-b6oeYd_eF9jFYWFTOz0Ki9DqiLjI0fvFx9cquQwuZT2OHdpqvLxz/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
@@ -569,6 +569,20 @@ let FILTRO_VIGENCIA = "";
 function formatoMoneda(n){
   if(n===null||n===undefined||n==="") return "—";
   return "$ " + Number(n).toLocaleString("es-AR",{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+/* Parsea un monto que puede venir como número, string vacío, o texto con
+   formato ("$ 720.000", "720000,50", etc). Devuelve null si NO hay dato
+   real (para no confundir "sin cargar" con "vale $0"). */
+function parseMonto(v){
+  if(v === null || v === undefined || v === "") return null;
+  if(typeof v === "number"){ return isNaN(v) ? null : v; }
+  let s = String(v).trim();
+  if(s === "") return null;
+  s = s.replace(/\$/g, "").trim();
+  // formato AR: punto de miles, coma decimal -> normalizar a punto decimal
+  if(s.includes(",") ){ s = s.replace(/\./g, "").replace(",", "."); }
+  const n = parseFloat(s);
+  return isNaN(n) ? null : n;
 }
 function formatoFecha(f){
   if(!f) return "—";
@@ -937,7 +951,7 @@ window.abrirDetalle = async function(id){
     ${historial.length===0
       ? `<div class="vacio-panel" style="background:#fff;border:1px solid var(--linea);">Sin registros históricos para este inmueble todavía.</div>`
       : `<table class="tabla-historial"><thead><tr><th>Expediente origen</th><th>Inicio</th><th>Índice</th><th>Monto</th></tr></thead><tbody>
-          ${historial.map(h=>`<tr><td data-label="Expediente origen">${h["Expediente Origen"]||"—"}</td><td data-label="Inicio">${formatoFecha(h["Fecha Inicio Contrato"])||h["Fecha Inicio (texto orig.)"]||"—"}</td><td data-label="Índice">${h["Índice Actualización"]||"—"}</td><td data-label="Monto">${formatoMoneda(h["Monto ($)"])}</td></tr>`).join("")}
+          ${historial.map(h=>`<tr><td data-label="Expediente origen">${h["Expediente Origen"]||"—"}</td><td data-label="Inicio">${formatoFecha(h["Fecha Inicio Contrato"])||h["Fecha Inicio (texto orig.)"]||"—"}</td><td data-label="Índice">${h["Índice Actualización"]||"—"}</td><td data-label="Monto">${formatoMoneda(parseMonto(h["Monto ($)"]))}</td></tr>`).join("")}
         </tbody></table>`}
 
     <div class="tag-h3">Documentación y seguimiento</div>
@@ -968,22 +982,38 @@ function pintarEvolucionMontos(idInmueble, filas){
     return;
   }
 
-  const primero = filas[0];
-  const ultimo = filas[filas.length-1];
-  const montoInicial = Number(primero["Monto ($)"]) || 0;
-  const montoActual = Number(ultimo["Monto ($)"]) || 0;
+  // Separamos las filas que tienen un monto interpretable de las que no,
+  // para no mostrar "$0" cuando en realidad el dato vino vacío o mal cargado.
+  const conDato = filas.map(f => ({...f, _monto: parseMonto(f["Monto ($)"])})).filter(f => f._monto !== null);
+  const sinDato = filas.length - conDato.length;
+
+  if(conDato.length === 0){
+    cont.innerHTML = `
+      <div class="vacio-panel" style="background:#fff;border:1px solid var(--linea);">
+        Hay ${filas.length} registro(s) de evolución para este inmueble, pero ninguno tiene un monto válido cargado (columna "Monto ($)" vacía o con formato que no se pudo interpretar en la hoja Historial_Montos). Revisá esa hoja o cargá el dato manualmente.
+      </div>
+      <button class="btn btn-sm" style="margin-top:8px;" onclick="toggleFormMonto()">+ Cargar un monto anterior</button>
+      ${formMontoManualHtml(idInmueble)}`;
+    return;
+  }
+
+  const primero = conDato[0];
+  const ultimo = conDato[conDato.length-1];
+  const montoInicial = primero._monto;
+  const montoActual = ultimo._monto;
   const variacion = montoInicial > 0 ? ((montoActual - montoInicial) / montoInicial * 100) : 0;
-  const max = Math.max(...filas.map(f=>Number(f["Monto ($)"])||0), 1);
+  const max = Math.max(...conDato.map(f=>f._monto), 1);
 
   cont.innerHTML = `
+    ${sinDato > 0 ? `<div class="config-note" style="margin-bottom:10px;">⚠ ${sinDato} registro(s) de este inmueble no tienen un monto válido cargado y no se muestran en la línea de tiempo.</div>` : ""}
     <div class="resumen-evolucion">
       <div class="chip-evolucion"><div class="lbl">Empezó pagando</div><div class="val">${formatoMoneda(montoInicial)}</div></div>
       <div class="chip-evolucion"><div class="lbl">Paga actualmente</div><div class="val">${formatoMoneda(montoActual)}</div></div>
       <div class="chip-evolucion ${variacion>0?'subida':''}"><div class="lbl">Variación total</div><div class="val">${variacion.toFixed(0)}%</div></div>
     </div>
     <div class="mini-barras">
-      ${filas.map(f=>{
-        const m = Number(f["Monto ($)"])||0;
+      ${conDato.map(f=>{
+        const m = f._monto;
         const pct = max>0 ? (m/max*100) : 0;
         const fecha = formatoFecha(f["Fecha Desde"]) !== "—" ? formatoFecha(f["Fecha Desde"]) : (f["Fecha Desde"]||"—");
         return `<div class="mini-fila" title="${f["Motivo / Concepto"]||''}">
@@ -1015,9 +1045,10 @@ window.toggleFormMonto = function(){
 };
 window.guardarMontoManual = async function(idInmueble){
   const fecha = document.getElementById("fm-fecha").value;
-  const monto = document.getElementById("fm-monto").value;
+  const montoInput = document.getElementById("fm-monto").value;
   const motivo = document.getElementById("fm-motivo").value || "Carga manual";
-  if(!monto){ mostrarToast("Ingresá un monto.", true); return; }
+  const monto = parseMonto(montoInput);
+  if(monto === null || monto <= 0){ mostrarToast("Ingresá un monto válido, mayor a 0.", true); return; }
   mostrarCargando("Guardando monto histórico…");
   try{
     const res = await fetch(API_URL, { method:"POST", body: JSON.stringify({
