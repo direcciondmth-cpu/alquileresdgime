@@ -582,7 +582,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbzNCTZhMf_K4es-b6oeYd_eF9jFYWFTOz0Ki9DqiLjI0fvFx9cquQwuZT2OHdpqvLxz/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwF5OftcRTP-Y1OzxNdCJK4Vk2jhf-qidXKsuLLW74llZBGKh9L8n1OjTijnO28kTiM/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
@@ -928,6 +928,8 @@ document.querySelectorAll(".pill").forEach(p=>{
 /* ---------- Modal detalle + historial ---------- */
 const modalDetalleBg = document.getElementById("modal-detalle-bg");
 let ID_DETALLE_ACTUAL = null;
+let HISTORIAL_CONTRATOS_ACTUAL = [];
+let HISTORIAL_MONTOS_ACTUAL = [];
 
 window.abrirDetalle = async function(id){
   ID_DETALLE_ACTUAL = id;
@@ -954,6 +956,8 @@ window.abrirDetalle = async function(id){
       ocultarCargando();
     }
   }
+  HISTORIAL_CONTRATOS_ACTUAL = historial;
+  HISTORIAL_MONTOS_ACTUAL = historialMontos;
   const body = document.getElementById("detalle-body");
   body.innerHTML = `
     <div class="detalle-grid">
@@ -973,9 +977,10 @@ window.abrirDetalle = async function(id){
     <div class="tag-h3">Historial de contratos anteriores</div>
     ${historial.length===0
       ? `<div class="vacio-panel" style="background:#fff;border:1px solid var(--linea);">Sin registros históricos para este inmueble todavía.</div>`
-      : `<table class="tabla-historial"><thead><tr><th>Expediente origen</th><th>Inicio</th><th>Índice</th><th>Monto</th></tr></thead><tbody>
-          ${historial.map(h=>`<tr><td data-label="Expediente origen">${h["Expediente Origen"]||"—"}</td><td data-label="Inicio">${formatoFecha(h["Fecha Inicio Contrato"])||h["Fecha Inicio (texto orig.)"]||"—"}</td><td data-label="Índice">${h["Índice Actualización"]||"—"}</td><td data-label="Monto">${formatoMoneda(parseMonto(h["Monto ($)"]))}</td></tr>`).join("")}
+      : `<table class="tabla-historial"><thead><tr><th>Expediente origen</th><th>Inicio</th><th>Índice</th><th>Monto</th><th>Acciones</th></tr></thead><tbody>
+          ${historial.map(h=>`<tr><td data-label="Expediente origen">${h["Expediente Origen"]||"—"}</td><td data-label="Inicio">${formatoFecha(h["Fecha Inicio Contrato"])||h["Fecha Inicio (texto orig.)"]||"—"}</td><td data-label="Índice">${h["Índice Actualización"]||"—"}</td><td data-label="Monto">${formatoMoneda(parseMonto(h["Monto ($)"]))}</td><td data-label="Acciones" style="white-space:nowrap;"><button class="btn btn-sm" onclick="editarHistorialContrato(${id}, ${h["ID"]})">Editar</button> <button class="btn btn-sm btn-danger" onclick="borrarHistorialContrato(${id}, ${h["ID"]})">Borrar</button></td></tr>`).join("")}
         </tbody></table>`}
+    <button class="btn btn-sm" style="margin-top:8px;" onclick="crearHistorialContrato(${id})">+ Cargar contrato anterior</button>
 
     <div class="tag-h3">Documentación y seguimiento</div>
     ${documentacion.length===0
@@ -1043,6 +1048,7 @@ function pintarEvolucionMontos(idInmueble, filas){
           <div class="mini-fecha">${fecha}</div>
           <div class="mini-track"><div class="mini-fill" style="width:${pct}%"></div></div>
           <div class="mini-monto">${formatoMoneda(m)}</div>
+          <div style="white-space:nowrap;"><button class="btn btn-sm" onclick="editarMontoHistorico(${idInmueble}, ${f["ID"]})">Editar</button> <button class="btn btn-sm btn-danger" onclick="borrarMontoHistorico(${idInmueble}, ${f["ID"]})">Borrar</button></div>
         </div>`;
       }).join("")}
     </div>
@@ -1084,6 +1090,78 @@ window.guardarMontoManual = async function(idInmueble){
     abrirDetalle(idInmueble); // recarga el modal con el dato nuevo
   }catch(err){ mostrarToast("Error: " + err.message, true); }
   finally{ ocultarCargando(); }
+};
+
+function fechaParaEditar(valor){
+  if(!valor) return "";
+  const s = String(valor);
+  return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0,10) : "";
+}
+async function guardarCambioHistorico(accion, id, data, idInmueble, mensaje){
+  mostrarCargando(mensaje);
+  try{
+    const res = await fetch(API_URL, {method:"POST", body:JSON.stringify({action, id, data, usuario:USUARIO_ACTUAL})}).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error || "No se pudo guardar el cambio.");
+    mostrarToast("Cambio guardado.");
+    abrirDetalle(idInmueble);
+  }catch(err){ mostrarToast("Error: " + err.message, true); }
+  finally{ ocultarCargando(); }
+}
+window.editarMontoHistorico = async function(idInmueble, idMonto){
+  const f = HISTORIAL_MONTOS_ACTUAL.find(x=>Number(x["ID"])===Number(idMonto));
+  if(!f) return mostrarToast("No se encontró el monto histórico.", true);
+  const fecha = prompt("Vigente desde (AAAA-MM-DD)", fechaParaEditar(f["Fecha Desde"]));
+  if(fecha===null) return;
+  const monto = prompt("Monto ($)", parseMonto(f["Monto ($)"]) ?? "");
+  if(monto===null) return;
+  const motivo = prompt("Motivo / concepto", f["Motivo / Concepto"] || "");
+  if(motivo===null) return;
+  const expediente = prompt("Expediente (opcional)", f["Expediente"] || "");
+  if(expediente===null) return;
+  const montoNumero = parseMonto(monto);
+  if(montoNumero===null || montoNumero<=0) return mostrarToast("Ingresá un monto válido, mayor a 0.", true);
+  await guardarCambioHistorico("update_historial_monto", idMonto, {fecha_desde:fecha, monto:montoNumero, motivo, expediente}, idInmueble, "Actualizando monto histórico…");
+};
+window.borrarMontoHistorico = async function(idInmueble, idMonto){
+  if(!confirm("¿Borrar este monto del historial? Esta acción no se puede deshacer.")) return;
+  await guardarCambioHistorico("delete_historial_monto", idMonto, {}, idInmueble, "Eliminando monto histórico…");
+};
+window.crearHistorialContrato = async function(idInmueble){
+  const actual = DATA.find(x=>Number(x["ID"])===Number(idInmueble)) || {};
+  const expediente_origen = prompt("Expediente de origen");
+  if(expediente_origen===null) return;
+  const fecha_inicio = prompt("Inicio del contrato (AAAA-MM-DD)");
+  if(fecha_inicio===null) return;
+  const indice_actualizacion = prompt("Índice de actualización", "");
+  if(indice_actualizacion===null) return;
+  const monto = prompt("Monto ($)", "");
+  if(monto===null) return;
+  const periodo = prompt("Período (opcional)", "");
+  if(periodo===null) return;
+  const montoNumero = monto === "" ? "" : parseMonto(monto);
+  if(montoNumero===null) return mostrarToast("Ingresá un monto válido.", true);
+  await guardarCambioHistorico("add_historial", null, {id_inmueble:idInmueble, servicio_efector:actual["Servicio / Efector"]||"", domicilio:actual["Domicilio"]||"", expediente_origen, fecha_inicio, indice_actualizacion, monto:montoNumero, periodo}, idInmueble, "Guardando contrato anterior…");
+};
+window.editarHistorialContrato = async function(idInmueble, idHistorial){
+  const h = HISTORIAL_CONTRATOS_ACTUAL.find(x=>Number(x["ID"])===Number(idHistorial));
+  if(!h) return mostrarToast("No se encontró el contrato histórico.", true);
+  const expediente_origen = prompt("Expediente de origen", h["Expediente Origen"] || "");
+  if(expediente_origen===null) return;
+  const fecha_inicio = prompt("Inicio del contrato (AAAA-MM-DD)", fechaParaEditar(h["Fecha Inicio Contrato"]));
+  if(fecha_inicio===null) return;
+  const indice_actualizacion = prompt("Índice de actualización", h["Índice Actualización"] || "");
+  if(indice_actualizacion===null) return;
+  const monto = prompt("Monto ($)", parseMonto(h["Monto ($)"]) ?? "");
+  if(monto===null) return;
+  const periodo = prompt("Período (opcional)", h["Período"] || "");
+  if(periodo===null) return;
+  const montoNumero = monto === "" ? "" : parseMonto(monto);
+  if(montoNumero===null) return mostrarToast("Ingresá un monto válido.", true);
+  await guardarCambioHistorico("update_historial", idHistorial, {servicio_efector:h["Servicio / Efector"]||"", domicilio:h["Domicilio"]||"", expediente_origen, fecha_inicio, fecha_inicio_texto:h["Fecha Inicio (texto orig.)"]||"", indice_actualizacion, monto:montoNumero, periodo}, idInmueble, "Actualizando contrato anterior…");
+};
+window.borrarHistorialContrato = async function(idInmueble, idHistorial){
+  if(!confirm("¿Borrar este contrato del historial? Esta acción no se puede deshacer.")) return;
+  await guardarCambioHistorico("delete_historial", idHistorial, {}, idInmueble, "Eliminando contrato anterior…");
 };
 
 /* ---------- Modal alta/edición ---------- */
