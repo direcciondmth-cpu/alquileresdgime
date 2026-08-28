@@ -263,6 +263,14 @@ td.acciones{display:flex;gap:6px;}
   .tabla-historial td:last-child{border-bottom:none;}
   .tabla-historial td::before{content:attr(data-label);font-family:var(--mono);font-size:9.5px;text-transform:uppercase;color:var(--tinta-suave);text-align:left;flex:none;}
 }
+@media(min-width:900px) and (max-width:1300px){
+  .resumen{grid-template-columns:repeat(3,1fr);}
+  .paneles-inicio{grid-template-columns:1fr;}
+  main{padding-left:22px;padding-right:22px;}
+}
+@media(min-width:1301px) and (max-width:1480px){
+  .resumen{grid-template-columns:repeat(4,1fr);}
+}
 .tag-h3{font-family:var(--serif);font-size:15px;margin:18px 0 8px;color:var(--azul-950);}
 
 /* ---- Evolución de montos ---- */
@@ -514,6 +522,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
         <div class="campo"><label>Monto estimado ($)</label><input id="g-monto" type="number" min="0" step="0.01"></div>
       </div>
       <div class="campo"><label>Observaciones de la visita</label><textarea id="g-observaciones" placeholder="Condiciones, accesibilidad, distribución, reparaciones necesarias…"></textarea></div>
+      <div class="campo"><label>Fotos y archivos del relevamiento</label><input id="g-archivos" type="file" accept="image/*,.pdf,.doc,.docx" capture="environment" multiple><small style="color:var(--tinta-suave);display:block;margin-top:5px;">Podés sacar fotos con el celular o seleccionar archivos. Máximo 8 MB por archivo.</small></div>
       <button class="btn btn-primary" id="btn-guardar-gestion">Guardar gestión</button>
     </div>
     <div class="panel">
@@ -654,7 +663,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbx4hpddqwRVYP-NVbIKNyUWxF1bUJwGAU9LmwGynYJCgYux-IHYvuDATUv3pBqfC5Uy/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzNCTZhMf_K4es-b6oeYd_eF9jFYWFTOz0Ki9DqiLjI0fvFx9cquQwuZT2OHdpqvLxz/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
@@ -805,17 +814,27 @@ document.getElementById("btn-guardar-gestion").onclick = async function(){
   try{
     const res = await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"create_gestion",data,usuario:USUARIO_ACTUAL})}).then(r=>r.json());
     if(!res.ok) throw new Error(res.error);
-    ["g-efector","g-domicilio","g-localidad","g-contacto","g-telefono","g-fecha","g-m2","g-monto","g-observaciones"].forEach(id=>document.getElementById(id).value="");
-    mostrarToast("Gestión registrada."); cargarGestiones();
-  }catch(err){ mostrarToast("Error: "+err.message,true); } finally{ this.classList.remove("cargando"); }
+    const archivos=[...document.getElementById("g-archivos").files];
+    if(archivos.length){
+      mostrarCargando("Guardando fotos y archivos en Drive…");
+      for(const archivo of archivos) await subirArchivoGestionDesdeArchivo(res.data.id,archivo);
+    }
+    ["g-efector","g-domicilio","g-localidad","g-contacto","g-telefono","g-fecha","g-m2","g-monto","g-observaciones","g-archivos"].forEach(id=>document.getElementById(id).value="");
+    mostrarToast(archivos.length ? "Gestión y archivos registrados." : "Gestión registrada."); cargarGestiones();
+  }catch(err){ mostrarToast("Error: "+err.message,true); } finally{ this.classList.remove("cargando"); ocultarCargando(); }
 };
+async function subirArchivoGestionDesdeArchivo(idGestion,file){
+  if(file.size > 8*1024*1024) throw new Error(file.name+" supera el límite de 8 MB.");
+  const base64=await new Promise((ok,fail)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=fail;r.readAsDataURL(file);});
+  const res=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"upload_gestion_archivo",data:{id_gestion:idGestion,nombre:file.name,mime_type:file.type,base64},usuario:USUARIO_ACTUAL})}).then(r=>r.json());
+  if(!res.ok) throw new Error(res.error || "No se pudo subir "+file.name);
+}
 window.subirArchivoGestion = async function(idGestion){
   const input = document.getElementById("archivo-gestion-"+idGestion), file=input && input.files[0];
   if(!file) return mostrarToast("Elegí una foto o archivo primero.", true);
   if(file.size > 8*1024*1024) return mostrarToast("El archivo supera el límite de 8 MB.", true);
-  const base64 = await new Promise((ok,fail)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=fail;r.readAsDataURL(file);});
   mostrarCargando("Subiendo archivo a Drive…");
-  try{const res=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"upload_gestion_archivo",data:{id_gestion:idGestion,nombre:file.name,mime_type:file.type,base64},usuario:USUARIO_ACTUAL})}).then(r=>r.json());if(!res.ok)throw new Error(res.error);mostrarToast("Archivo guardado en Drive.");input.value="";verArchivosGestion(idGestion);}catch(err){mostrarToast("Error: "+err.message,true);}finally{ocultarCargando();}
+  try{await subirArchivoGestionDesdeArchivo(idGestion,file);mostrarToast("Archivo guardado en Drive.");input.value="";verArchivosGestion(idGestion);}catch(err){mostrarToast("Error: "+err.message,true);}finally{ocultarCargando();}
 };
 window.verArchivosGestion = async function(idGestion){
   const cont=document.getElementById("archivos-gestion-"+idGestion); cont.textContent="Cargando archivos…";
