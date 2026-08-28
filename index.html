@@ -351,8 +351,11 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
   .nav-tabs button{flex:none;width:100%;text-align:left;padding:11px 12px;border-left:3px solid transparent;}
   .nav-tabs button.activo{border-left-color:var(--oliva);}
   .top-actions{margin-top:auto;flex-wrap:wrap;}.top-actions .btn{flex:1;justify-content:center;}
-  main{max-width:none;margin-left:236px;padding:26px 30px 48px;min-height:100vh;}
-  footer{margin-left:236px;}
+  main{max-width:none;width:auto;margin-left:236px;padding:26px 30px 48px;min-height:100vh;}
+  footer{width:auto;margin-left:236px;}
+  .top-actions{width:100%;display:grid;grid-template-columns:36px minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center;}
+  .top-actions .btn{min-width:0;padding:8px 6px;font-size:11px;white-space:nowrap;}
+  .top-actions .campanita{width:36px;height:36px;}
 }
 @media(max-width:899px){
   .btn-menu{display:inline-flex;}
@@ -367,6 +370,8 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
   main{padding:14px 12px 34px;}.top-row{padding:8px 0;}.top-actions{gap:5px;}.campanita{width:34px;height:34px;}
   .grid3{grid-template-columns:1fr !important;}.campo input,.campo select,textarea{font-size:16px;min-height:42px;}
   input[type=file]{width:100%;max-width:100% !important;min-height:42px;}.btn{min-height:38px;}.modal-body{padding:14px 12px;}
+  .filtros input[type=text],.filtros input[type=number],.filtros input[type=date],.filtros input[type=month],.filtros select{width:100%;min-width:0;min-height:42px;font-size:16px;}
+  .top-actions .btn{padding:8px 8px;}.section-sub{line-height:1.45;}
 }
 </style>
 </head>
@@ -649,7 +654,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbx4hpddqwRVYP-NVbIKNyUWxF1bUJwGAU9LmwGynYJCgYux-IHYvuDATUv3pBqfC5Uy/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzNCTZhMf_K4es-b6oeYd_eF9jFYWFTOz0Ki9DqiLjI0fvFx9cquQwuZT2OHdpqvLxz/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
