@@ -357,6 +357,8 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     <nav class="nav-tabs">
       <button class="activo" data-vista="inicio">Inicio</button>
       <button data-vista="alquileres">Alquileres</button>
+      <button data-vista="gestiones">Gestiones</button>
+      <button data-vista="calendario">Calendario</button>
       <button data-vista="alertas">Alertas</button>
       <button data-vista="enlaces">Enlaces</button>
       <button data-vista="config">Configuración</button>
@@ -423,6 +425,10 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
           <option value="FALTA RESOL.">Falta resolución</option>
           <option value="DE BAJA">De baja</option>
         </select>
+        <input type="number" id="filtro-monto-min" placeholder="Monto mínimo" min="0">
+        <input type="number" id="filtro-monto-max" placeholder="Monto máximo" min="0">
+        <input type="date" id="filtro-fin-desde" title="Fin de contrato desde">
+        <input type="date" id="filtro-fin-hasta" title="Fin de contrato hasta">
         <span class="pill activo" data-vig="">Todos</span>
         <span class="pill" data-vig="VIGENTE">🟢 Vigentes</span>
         <span class="pill" data-vig="POR VENCER">🟡 Por vencer</span>
@@ -448,6 +454,43 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
           <tr><td colspan="10" class="vacio"><div class="icono">⏳</div>Cargando información desde la base…</td></tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <!-- ======================= VISTA: CALENDARIO ======================= -->
+  <section class="vista" id="vista-calendario">
+    <p class="eyebrow">Agenda de trabajo</p>
+    <h2 class="section-title">Calendario de vencimientos y tareas</h2>
+    <p class="section-sub">Reúne fines de contrato, visitas registradas y pendientes con fecha límite.</p>
+    <div class="toolbar"><div class="filtros"><input type="month" id="calendario-mes"><select id="calendario-tipo"><option value="">Todos los eventos</option><option value="Contrato">Contratos</option><option value="Visita">Visitas</option><option value="Pendiente">Pendientes</option></select></div><div class="filtros"><button class="btn btn-sm" id="btn-exportar-calendario">⇩ Excel</button></div></div>
+    <div class="panel"><div id="lista-calendario"><div class="vacio-panel">Cargando calendario…</div></div></div>
+  </section>
+
+  <!-- ======================= VISTA: GESTIONES ======================= -->
+  <section class="vista" id="vista-gestiones">
+    <p class="eyebrow">Módulo</p>
+    <h2 class="section-title">Gestiones y visitas</h2>
+    <p class="section-sub">Relevamiento de posibles inmuebles antes de iniciar un alquiler. Las fotos y archivos se guardan en Google Drive.</p>
+    <div class="panel" style="margin-bottom:20px;padding:16px;">
+      <div class="panel-head" style="margin:-16px -16px 16px;"><h3>Nueva gestión</h3></div>
+      <div class="grid3">
+        <div class="campo"><label>Efector solicitante *</label><input id="g-efector" placeholder="Ej. CAPS Barrio Norte"></div>
+        <div class="campo"><label>Domicilio visitado *</label><input id="g-domicilio" placeholder="Calle y número"></div>
+        <div class="campo"><label>Localidad</label><input id="g-localidad"></div>
+        <div class="campo"><label>Contacto / propietario</label><input id="g-contacto"></div>
+        <div class="campo"><label>Teléfono</label><input id="g-telefono"></div>
+        <div class="campo"><label>Fecha de visita</label><input id="g-fecha" type="date"></div>
+        <div class="campo"><label>Estado</label><select id="g-estado"><option>RELEVADO</option><option>APTO</option><option>NO APTO</option><option>EN NEGOCIACIÓN</option><option>DESCARTADO</option></select></div>
+        <div class="campo"><label>Metros cuadrados</label><input id="g-m2" type="number" min="0" step="0.01"></div>
+        <div class="campo"><label>Monto estimado ($)</label><input id="g-monto" type="number" min="0" step="0.01"></div>
+      </div>
+      <div class="campo"><label>Observaciones de la visita</label><textarea id="g-observaciones" placeholder="Condiciones, accesibilidad, distribución, reparaciones necesarias…"></textarea></div>
+      <button class="btn btn-primary" id="btn-guardar-gestion">Guardar gestión</button>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Gestiones registradas</h3><span id="gestion-contador" class="badge badge-gris">0</span></div>
+      <div class="toolbar" style="padding:12px 14px 0;"><div class="filtros"><input id="buscador-gestiones" placeholder="Buscar efector, domicilio o contacto…"><select id="filtro-gestion-estado"><option value="">Todos los estados</option><option>RELEVADO</option><option>APTO</option><option>NO APTO</option><option>EN NEGOCIACIÓN</option><option>DESCARTADO</option><option>CONVERTIDO EN ALQUILER</option></select></div><div class="filtros"><button class="btn btn-sm" id="btn-exportar-gestiones">⇩ Excel</button></div></div>
+      <div id="lista-gestiones"><div class="vacio-panel">Cargando gestiones…</div></div>
     </div>
   </section>
 
@@ -490,7 +533,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     <div class="panel" style="margin-bottom:20px;">
       <div class="panel-head">
         <h3>Destinatarios</h3>
-        <button class="btn btn-sm btn-primary" id="btn-enviar-prueba">✉ Enviar prueba ahora</button>
+        <div style="display:flex;gap:8px;"><button class="btn btn-sm" id="btn-crear-respaldo">▣ Crear respaldo</button><button class="btn btn-sm btn-primary" id="btn-enviar-prueba">✉ Enviar prueba ahora</button></div>
       </div>
       <div style="padding:14px;">
         <div class="grid2" style="grid-template-columns:2fr 1.3fr auto;align-items:end;">
@@ -582,10 +625,12 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbwF5OftcRTP-Y1OzxNdCJK4Vk2jhf-qidXKsuLLW74llZBGKh9L8n1OjTijnO28kTiM/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzNCTZhMf_K4es-b6oeYd_eF9jFYWFTOz0Ki9DqiLjI0fvFx9cquQwuZT2OHdpqvLxz/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
+let GESTIONES = [];
+let ALERTAS_ACTUALES = {};
 let FILTRO_VIGENCIA = "";
 
 /* ---------- Utilidades ---------- */
@@ -685,7 +730,10 @@ async function cargarDatos(){
     pintarKpis(resResumen.ok ? resResumen.data : null);
     pintarInicio();
     pintarAlertas(resAlertas.ok ? resAlertas.data : null);
+    ALERTAS_ACTUALES = resAlertas.ok ? resAlertas.data : {};
     cargarCorreos();
+    cargarGestiones();
+    pintarCalendario();
     document.getElementById("ultima-actualizacion").textContent =
       "Dirección de Recursos Físicos · actualizado " + new Date().toLocaleString("es-AR");
   }catch(err){
@@ -694,6 +742,78 @@ async function cargarDatos(){
     ocultarCargando();
   }
 }
+
+/* ---------- Módulo Gestiones ---------- */
+async function cargarGestiones(){
+  const cont = document.getElementById("lista-gestiones");
+  if(API_URL.includes("PEGAR_ACA")) return;
+  try{
+    const res = await fetch(`${API_URL}?action=gestiones`).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    GESTIONES = res.data || [];
+    pintarCalendario();
+    document.getElementById("gestion-contador").textContent = GESTIONES.length;
+    const q=(document.getElementById("buscador-gestiones")?.value||"").toLowerCase(), estadoFiltro=document.getElementById("filtro-gestion-estado")?.value||"";
+    const visibles=GESTIONES.filter(g=>(!estadoFiltro || g["Estado"]===estadoFiltro) && (!q || [g["Efector"],g["Domicilio"],g["Contacto / Propietario"]].join(" ").toLowerCase().includes(q)));
+    if(!visibles.length){ cont.innerHTML = '<div class="vacio-panel">No hay gestiones que coincidan con los filtros.</div>'; return; }
+    cont.innerHTML = visibles.map(g=>`<div style="padding:14px;border-bottom:1px solid var(--linea);">
+      <div style="display:flex;gap:10px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;"><div><strong>${g["Efector"]||"Sin efector"}</strong><div style="font-size:13px;color:var(--muted);margin-top:3px;">${g["Domicilio"]||"—"}${g["Localidad"] ? ' · '+g["Localidad"] : ''}</div></div><span class="badge badge-ambar">${g["Estado"]||"RELEVADO"}</span></div>
+      <div style="font-size:12px;color:var(--muted);margin:9px 0;">Visita: ${formatoFecha(g["Fecha Visita"])} · ${g["Metros Cuadrados"] ? g["Metros Cuadrados"]+' m²' : 'm² sin cargar'} · ${g["Monto Estimado ($)"] ? formatoMoneda(g["Monto Estimado ($)"]) : 'monto sin cargar'}</div>
+      ${g["Observaciones"] ? `<div style="font-size:13px;margin-bottom:9px;">${g["Observaciones"]}</div>` : ''}
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="file" id="archivo-gestion-${g["ID"]}" accept="image/*,.pdf,.doc,.docx" style="max-width:230px;font-size:12px;"><button class="btn btn-sm" onclick="subirArchivoGestion(${g["ID"]})">Adjuntar a Drive</button><button class="btn btn-sm" onclick="verArchivosGestion(${g["ID"]})">Ver archivos</button><button class="btn btn-sm" onclick="verHistorialGestion(${g["ID"]})">Historial</button><button class="btn btn-sm" onclick="editarGestionPanel(${g["ID"]})">Editar</button><button class="btn btn-sm" onclick="cambiarEstadoGestion(${g["ID"]})">Estado</button>${g["Estado"]!=="CONVERTIDO EN ALQUILER" ? `<button class="btn btn-sm btn-primary" onclick="convertirGestionAlquiler(${g["ID"]})">Convertir en alquiler</button>` : ''}</div>
+      <div id="archivos-gestion-${g["ID"]}" style="font-size:12px;margin-top:8px;"></div>
+      <div id="historial-gestion-${g["ID"]}" style="font-size:12px;margin-top:8px;"></div>
+    </div>`).join('');
+  }catch(err){ cont.innerHTML = `<div class="vacio-panel">No se pudieron cargar las gestiones: ${err.message}</div>`; }
+}
+document.getElementById("btn-guardar-gestion").onclick = async function(){
+  const data = {efector:document.getElementById("g-efector").value.trim(), domicilio:document.getElementById("g-domicilio").value.trim(), localidad:document.getElementById("g-localidad").value.trim(), contacto:document.getElementById("g-contacto").value.trim(), telefono:document.getElementById("g-telefono").value.trim(), fecha_visita:document.getElementById("g-fecha").value, estado:document.getElementById("g-estado").value, metros_cuadrados:document.getElementById("g-m2").value, monto_estimado:document.getElementById("g-monto").value, observaciones:document.getElementById("g-observaciones").value.trim()};
+  if(!data.efector || !data.domicilio) return mostrarToast("Completá el efector y el domicilio visitado.", true);
+  this.classList.add("cargando");
+  try{
+    const res = await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"create_gestion",data,usuario:USUARIO_ACTUAL})}).then(r=>r.json());
+    if(!res.ok) throw new Error(res.error);
+    ["g-efector","g-domicilio","g-localidad","g-contacto","g-telefono","g-fecha","g-m2","g-monto","g-observaciones"].forEach(id=>document.getElementById(id).value="");
+    mostrarToast("Gestión registrada."); cargarGestiones();
+  }catch(err){ mostrarToast("Error: "+err.message,true); } finally{ this.classList.remove("cargando"); }
+};
+window.subirArchivoGestion = async function(idGestion){
+  const input = document.getElementById("archivo-gestion-"+idGestion), file=input && input.files[0];
+  if(!file) return mostrarToast("Elegí una foto o archivo primero.", true);
+  if(file.size > 8*1024*1024) return mostrarToast("El archivo supera el límite de 8 MB.", true);
+  const base64 = await new Promise((ok,fail)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=fail;r.readAsDataURL(file);});
+  mostrarCargando("Subiendo archivo a Drive…");
+  try{const res=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"upload_gestion_archivo",data:{id_gestion:idGestion,nombre:file.name,mime_type:file.type,base64},usuario:USUARIO_ACTUAL})}).then(r=>r.json());if(!res.ok)throw new Error(res.error);mostrarToast("Archivo guardado en Drive.");input.value="";verArchivosGestion(idGestion);}catch(err){mostrarToast("Error: "+err.message,true);}finally{ocultarCargando();}
+};
+window.verArchivosGestion = async function(idGestion){
+  const cont=document.getElementById("archivos-gestion-"+idGestion); cont.textContent="Cargando archivos…";
+  try{const res=await fetch(`${API_URL}?action=gestion_archivos&id=${idGestion}`).then(r=>r.json());if(!res.ok)throw new Error(res.error);cont.innerHTML=res.data.length ? 'Archivos: '+res.data.map(a=>`<a href="${a["URL Drive"]}" target="_blank" rel="noopener">${a["Nombre Archivo"]}</a> <button class="btn btn-sm btn-danger" onclick="borrarArchivoGestion(${idGestion},${a["ID"]})">Borrar</button>`).join(' · ') : 'Sin archivos adjuntos.';}catch(err){cont.textContent="No se pudieron cargar los archivos.";}
+};
+window.verHistorialGestion = async function(idGestion){const cont=document.getElementById("historial-gestion-"+idGestion);cont.textContent="Cargando historial…";try{const res=await fetch(`${API_URL}?action=gestion_historial&id=${idGestion}`).then(r=>r.json());if(!res.ok)throw new Error(res.error);cont.innerHTML=res.data.length ? '<strong>Historial:</strong> '+res.data.map(h=>`${formatoFecha(h["Fecha"])} · ${h["Acción / Estado"]}${h["Detalle"]?' · '+h["Detalle"]:''}`).join('<br>') : 'Sin movimientos.';}catch(e){cont.textContent='No se pudo cargar el historial.';}};
+window.editarGestionPanel=async function(id){const g=GESTIONES.find(x=>Number(x["ID"])===Number(id));if(!g)return;const efector=prompt("Efector",g["Efector"]||"");if(efector===null)return;const domicilio=prompt("Domicilio",g["Domicilio"]||"");if(domicilio===null)return;const observaciones=prompt("Observaciones",g["Observaciones"]||"");if(observaciones===null)return;mostrarCargando("Actualizando gestión…");try{const r=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"update_gestion",id,data:{efector,domicilio,localidad:g["Localidad"]||"",contacto:g["Contacto / Propietario"]||"",telefono:g["Teléfono"]||"",fecha_visita:fechaParaEditar(g["Fecha Visita"]),estado:g["Estado"]||"RELEVADO",metros_cuadrados:g["Metros Cuadrados"]||"",monto_estimado:g["Monto Estimado ($)"]||"",observaciones,responsable:g["Responsable"]||"",detalle_historial:"Datos editados desde el panel"},usuario:USUARIO_ACTUAL})}).then(x=>x.json());if(!r.ok)throw new Error(r.error);mostrarToast("Gestión actualizada.");cargarGestiones();}catch(e){mostrarToast("Error: "+e.message,true);}finally{ocultarCargando();}};
+window.borrarArchivoGestion=async function(idGestion,idArchivo){if(!confirm("¿Borrar este archivo de Drive?"))return;mostrarCargando("Eliminando archivo…");try{const r=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"delete_gestion_archivo",id:idArchivo,usuario:USUARIO_ACTUAL})}).then(x=>x.json());if(!r.ok)throw new Error(r.error);mostrarToast("Archivo eliminado.");cargarGestiones();}catch(e){mostrarToast("Error: "+e.message,true);}finally{ocultarCargando();}};
+window.cambiarEstadoGestion=async function(idGestion){const estado=prompt("Nuevo estado: RELEVADO, APTO, NO APTO, EN NEGOCIACIÓN, DESCARTADO","RELEVADO");if(!estado)return;mostrarCargando("Actualizando gestión…");try{const r=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"update_gestion_estado",id:idGestion,data:{estado,detalle:"Estado actualizado desde el panel"},usuario:USUARIO_ACTUAL})}).then(x=>x.json());if(!r.ok)throw new Error(r.error);mostrarToast("Estado actualizado.");cargarGestiones();}catch(e){mostrarToast("Error: "+e.message,true);}finally{ocultarCargando();}};
+window.convertirGestionAlquiler=async function(idGestion){if(!confirm("¿Convertir esta gestión en un alquiler? Podrás completar los datos restantes luego."))return;const res=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"convert_gestion_to_alquiler",id:idGestion,data:{},usuario:USUARIO_ACTUAL})}).then(r=>r.json());if(!res.ok)return mostrarToast("Error: "+res.error,true);mostrarToast("Gestión convertida en alquiler #"+res.data.id_alquiler+".");await cargarDatos();cargarGestiones();};
+document.getElementById("buscador-gestiones").addEventListener("input",cargarGestiones);
+document.getElementById("filtro-gestion-estado").addEventListener("change",cargarGestiones);
+
+/* ---------- Calendario ---------- */
+function pintarCalendario(){
+  const cont=document.getElementById("lista-calendario"); if(!cont) return;
+  const mes=document.getElementById("calendario-mes")?.value||"", tipo=document.getElementById("calendario-tipo")?.value||"";
+  const eventos=[];
+  DATA.forEach(r=>{if(r["Fecha Fin"])eventos.push({fecha:r["Fecha Fin"],tipo:"Contrato",titulo:(r["Servicio / Efector"]||"Alquiler")+" · fin de contrato",detalle:r["Domicilio"]||"",id:r["ID"]});});
+  GESTIONES.forEach(g=>{if(g["Fecha Visita"])eventos.push({fecha:g["Fecha Visita"],tipo:"Visita",titulo:g["Efector"]||"Gestión",detalle:g["Domicilio"]||""});});
+  (ALERTAS_ACTUALES.pendientes_documentacion||[]).forEach(p=>{if(p["Vencimiento"])eventos.push({fecha:p["Vencimiento"],tipo:"Pendiente",titulo:p["Tipo"]||"Pendiente",detalle:(p["Detalle"]||"")+(p["Responsable"]?" · Resp.: "+p["Responsable"]:""),id:p["ID Inmueble"]});});
+  const visibles=eventos.filter(e=>(!mes||String(e.fecha).slice(0,7)===mes)&&(!tipo||e.tipo===tipo)).sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha)));
+  window.EVENTOS_CALENDARIO=visibles;
+  cont.innerHTML=visibles.length?visibles.map(e=>`<div class="lista-simple" style="padding:12px;border-bottom:1px solid var(--linea);cursor:${e.id?'pointer':'default'};" ${e.id?`onclick="abrirDetalle(${e.id})"`:''}><div><div class="titulo-item">${formatoFecha(e.fecha)} · ${e.tipo}</div><div class="sub-item">${e.titulo}${e.detalle?' — '+e.detalle:''}</div></div><span class="badge badge-ambar">${e.tipo}</span></div>`).join(''):`<div class="vacio-panel">No hay eventos para los filtros seleccionados.</div>`;
+}
+document.getElementById("calendario-mes").value=new Date().toISOString().slice(0,7);
+document.getElementById("calendario-mes").addEventListener("change",pintarCalendario);
+document.getElementById("calendario-tipo").addEventListener("change",pintarCalendario);
+document.getElementById("btn-exportar-calendario").onclick=()=>{const filas=window.EVENTOS_CALENDARIO||[];if(!filas.length)return mostrarToast("No hay eventos para exportar.",true);const ws=XLSX.utils.json_to_sheet(filas.map(x=>({Fecha:formatoFecha(x.fecha),Tipo:x.tipo,Evento:x.titulo,Detalle:x.detalle||""})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Calendario");XLSX.writeFile(wb,`calendario_siprosa_${new Date().toISOString().slice(0,10)}.xlsx`);};
+document.getElementById("btn-exportar-gestiones").onclick=()=>{if(!GESTIONES.length)return mostrarToast("No hay gestiones para exportar.",true);const ws=XLSX.utils.json_to_sheet(GESTIONES);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Gestiones");XLSX.writeFile(wb,`gestiones_siprosa_${new Date().toISOString().slice(0,10)}.xlsx`);};
 
 /* ---------- Módulo Configuración: correos ---------- */
 async function cargarCorreos(){
@@ -776,6 +896,10 @@ document.getElementById("btn-enviar-prueba").onclick = async ()=>{
     }
   }catch(err){ mostrarToast("Error: " + err.message, true); }
   finally{ btn.classList.remove("cargando"); ocultarCargando(); }
+};
+document.getElementById("btn-crear-respaldo").onclick = async ()=>{
+  const btn=document.getElementById("btn-crear-respaldo"); btn.classList.add("cargando"); mostrarCargando("Creando respaldo en Drive…");
+  try{const res=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"crear_respaldo",usuario:USUARIO_ACTUAL})}).then(r=>r.json());if(!res.ok)throw new Error(res.error);mostrarToast("Respaldo creado en Drive.");window.open(res.data.url,"_blank");}catch(e){mostrarToast("Error: "+e.message,true);}finally{btn.classList.remove("cargando");ocultarCargando();}
 };
 
 function pintarKpis(resumen){
@@ -873,15 +997,29 @@ function pintarAlertas(alertas){
               </tr>`).join("") + `</tbody></table></div>`}
       </div>`;
   }).join("");
+  const extras = [
+    {key:"pendientes_documentacion", titulo:"📌 Documentación y tareas pendientes"},
+    {key:"impuestos_pendientes", titulo:"💰 Impuestos o servicios pendientes"}
+  ];
+  cont.innerHTML += extras.map(g=>{const items=alertas[g.key]||[];return `<div class="grupo-alertas"><h3>${g.titulo} <span class="contador">${items.length}</span></h3>${items.length ? `<div class="tabla-wrap"><table><tbody>${items.map(x=>`<tr class="fila-click" onclick="abrirDetalle(${x["ID Inmueble"]})"><td>${x["Tipo"]||x["Impuesto / Servicio"]||"Pendiente"}</td><td>${x["Detalle"]||x["Estado Impuesto"]||"—"}</td><td>${x["Vencimiento"]?formatoFecha(x["Vencimiento"]):x["Vencimiento Impuesto"]?formatoFecha(x["Vencimiento Impuesto"]):"Sin fecha"}</td><td>Abrir alquiler →</td></tr>`).join('')}</tbody></table></div>`:`<div class="vacio-panel" style="background:#fff;border:1px solid var(--linea);">Sin registros en esta categoría.</div>`}</div>`;}).join('');
 }
 
 /* ---------- Filtros tabla Alquileres ---------- */
 function filasFiltradas(){
   const q = document.getElementById("buscador").value.trim().toLowerCase();
   const estado = document.getElementById("filtro-estado").value;
+  const montoMin = Number(document.getElementById("filtro-monto-min").value) || 0;
+  const montoMax = Number(document.getElementById("filtro-monto-max").value) || Infinity;
+  const finDesde = document.getElementById("filtro-fin-desde").value;
+  const finHasta = document.getElementById("filtro-fin-hasta").value;
   return DATA.filter(r=>{
     if(FILTRO_VIGENCIA && r["Estado Vigencia"] !== FILTRO_VIGENCIA) return false;
     if(estado && r["Estado Trámite"] !== estado) return false;
+    const monto=Number(r["Monto Actual ($)"])||0;
+    if(monto<montoMin || monto>montoMax) return false;
+    const fin=String(r["Fecha Fin"]||"").slice(0,10);
+    if(finDesde && (!fin || fin<finDesde)) return false;
+    if(finHasta && (!fin || fin>finHasta)) return false;
     if(q){
       const texto = [r["Servicio / Efector"], r["Domicilio"], r["Locador"], r["Expediente"]].join(" ").toLowerCase();
       if(!texto.includes(q)) return false;
@@ -916,6 +1054,7 @@ function pintarTabla(){
 }
 document.getElementById("buscador").addEventListener("input", pintarTabla);
 document.getElementById("filtro-estado").addEventListener("change", pintarTabla);
+["filtro-monto-min","filtro-monto-max","filtro-fin-desde","filtro-fin-hasta"].forEach(id=>document.getElementById(id).addEventListener("input",pintarTabla));
 document.querySelectorAll(".pill").forEach(p=>{
   p.addEventListener("click", ()=>{
     document.querySelectorAll(".pill").forEach(x=>x.classList.remove("activo"));
@@ -930,6 +1069,7 @@ const modalDetalleBg = document.getElementById("modal-detalle-bg");
 let ID_DETALLE_ACTUAL = null;
 let HISTORIAL_CONTRATOS_ACTUAL = [];
 let HISTORIAL_MONTOS_ACTUAL = [];
+let COMPLEMENTO_ALQUILER_ACTUAL = {};
 
 window.abrirDetalle = async function(id){
   ID_DETALLE_ACTUAL = id;
@@ -940,17 +1080,26 @@ window.abrirDetalle = async function(id){
   let historial = [];
   let documentacion = [];
   let historialMontos = [];
+  let complemento = {};
+  let pendientes = [];
+  let archivosAlquiler = [];
   if(!API_URL.includes("PEGAR_ACA")){
     mostrarCargando("Buscando historial del inmueble…");
     try{
-      const [rh, rd, rm] = await Promise.all([
+      const [rh, rd, rm, rc, rp, ra] = await Promise.all([
         fetch(`${API_URL}?action=historial&id=${id}`).then(x=>x.json()),
         fetch(`${API_URL}?action=documentacion&id=${id}`).then(x=>x.json()),
-        fetch(`${API_URL}?action=historial_montos&id=${id}`).then(x=>x.json())
+        fetch(`${API_URL}?action=historial_montos&id=${id}`).then(x=>x.json()),
+        fetch(`${API_URL}?action=alquiler_complemento&id=${id}`).then(x=>x.json()),
+        fetch(`${API_URL}?action=alquiler_pendientes&id=${id}`).then(x=>x.json()),
+        fetch(`${API_URL}?action=alquiler_archivos&id=${id}`).then(x=>x.json())
       ]);
       if(rh.ok) historial = rh.data;
       if(rd.ok) documentacion = rd.data;
       if(rm.ok) historialMontos = rm.data;
+      if(rc.ok) complemento = rc.data || {};
+      if(rp.ok) pendientes = rp.data || [];
+      if(ra.ok) archivosAlquiler = ra.data || [];
     }catch(e){ /* silencioso: se muestra igual el detalle base */
     }finally{
       ocultarCargando();
@@ -958,6 +1107,8 @@ window.abrirDetalle = async function(id){
   }
   HISTORIAL_CONTRATOS_ACTUAL = historial;
   HISTORIAL_MONTOS_ACTUAL = historialMontos;
+  COMPLEMENTO_ALQUILER_ACTUAL = complemento;
+  window.PENDIENTES_ACTUALES = pendientes;
   const body = document.getElementById("detalle-body");
   body.innerHTML = `
     <div class="detalle-grid">
@@ -988,6 +1139,21 @@ window.abrirDetalle = async function(id){
       : `<table class="tabla-historial"><thead><tr><th>Observación</th><th>Seguimiento</th></tr></thead><tbody>
           ${documentacion.map(d=>`<tr><td data-label="Observación">${d["Observación / Estado"]||"—"}</td><td data-label="Seguimiento">${d["Seguimiento"]||"—"}</td></tr>`).join("")}
         </tbody></table>`}
+
+    <div class="tag-h3">Datos de la propiedad, impuestos y pendientes</div>
+    <div class="detalle-grid">
+      <div class="detalle-item"><label>Superficie</label><div class="val">${complemento["Metros Cuadrados"] ? complemento["Metros Cuadrados"]+' m²' : 'Sin cargar'}</div></div>
+      <div class="detalle-item"><label>Impuesto / servicio</label><div class="val">${complemento["Impuesto / Servicio"] || 'Sin cargar'}</div></div>
+      <div class="detalle-item"><label>Estado del impuesto</label><div class="val">${complemento["Estado Impuesto"] || 'Sin cargar'}</div></div>
+      <div class="detalle-item"><label>Vencimiento</label><div class="val">${formatoFecha(complemento["Vencimiento Impuesto"])}</div></div>
+    </div>
+    <button class="btn btn-sm" style="margin-top:8px;" onclick="editarComplementoAlquiler(${id})">Editar datos de propiedad e impuestos</button>
+    <div style="margin-top:12px;">${pendientes.length ? pendientes.map(p=>`<div style="padding:8px;border:1px solid var(--linea);border-radius:8px;margin-bottom:6px;font-size:13px;display:flex;gap:8px;justify-content:space-between;align-items:center;"><span><strong>${p["Tipo"]}</strong>${p["Detalle"] ? ' · '+p["Detalle"] : ''}${p["Responsable"] ? ' · Resp.: '+p["Responsable"] : ''}${p["Vencimiento"] ? ' · vence '+formatoFecha(p["Vencimiento"]) : ''}</span><span><button class="btn btn-sm" onclick="editarPendienteAlquiler(${id},${p["ID"]})">Editar</button> <button class="btn btn-sm ${p["Estado"]==='RESUELTO'?'':'btn-primary'}" onclick="resolverPendienteAlquiler(${id},${p["ID"]},'${p["Estado"]==='RESUELTO'?'PENDIENTE':'RESUELTO'}')">${p["Estado"]==='RESUELTO'?'Reabrir':'Resolver'}</button> <button class="btn btn-sm btn-danger" onclick="borrarPendienteAlquiler(${id},${p["ID"]})">Borrar</button></span></div>`).join('') : '<div class="vacio-panel" style="background:#fff;border:1px solid var(--linea);">No hay pendientes cargados.</div>'}</div>
+    <button class="btn btn-sm" style="margin-top:8px;" onclick="agregarPendienteAlquiler(${id})">+ Agregar pendiente</button>
+
+    <div class="tag-h3">Archivos del alquiler</div>
+    <div style="font-size:13px;margin-bottom:8px;">${archivosAlquiler.length ? archivosAlquiler.map(a=>`<a href="${a["URL Drive"]}" target="_blank" rel="noopener">${a["Nombre Archivo"]}</a> <button class="btn btn-sm btn-danger" onclick="borrarArchivoAlquiler(${id},${a["ID"]})">Borrar</button>`).join(' · ') : 'Sin archivos adjuntos.'}</div>
+    <select id="categoria-alquiler-${id}" style="max-width:150px;"><option>Planos</option><option>Contratos</option><option>Fotos</option><option>Impuestos</option><option>Otros</option></select> <input type="file" id="archivo-alquiler-${id}" accept="image/*,.pdf,.doc,.docx" style="max-width:245px;font-size:12px;"> <button class="btn btn-sm" onclick="subirArchivoAlquiler(${id})">Adjuntar a Drive</button>
   `;
   pintarEvolucionMontos(id, historialMontos);
   modalDetalleBg.classList.add("abierto");
@@ -1162,6 +1328,57 @@ window.editarHistorialContrato = async function(idInmueble, idHistorial){
 window.borrarHistorialContrato = async function(idInmueble, idHistorial){
   if(!confirm("¿Borrar este contrato del historial? Esta acción no se puede deshacer.")) return;
   await guardarCambioHistorico("delete_historial", idHistorial, {}, idInmueble, "Eliminando contrato anterior…");
+};
+
+window.editarComplementoAlquiler = async function(idInmueble){
+  const c = COMPLEMENTO_ALQUILER_ACTUAL || {};
+  const superficie = prompt("Metros cuadrados", c["Metros Cuadrados"] || "");
+  if(superficie===null) return;
+  const impuesto_servicio = prompt("Impuesto o servicio (ej. Rentas, CISI, luz)", c["Impuesto / Servicio"] || "");
+  if(impuesto_servicio===null) return;
+  const estado_impuesto = prompt("Estado del impuesto (ej. AL DÍA, PENDIENTE)", c["Estado Impuesto"] || "");
+  if(estado_impuesto===null) return;
+  const vencimiento_impuesto = prompt("Vencimiento del impuesto (AAAA-MM-DD, opcional)", fechaParaEditar(c["Vencimiento Impuesto"]));
+  if(vencimiento_impuesto===null) return;
+  const observaciones = prompt("Observaciones", c["Observaciones"] || "");
+  if(observaciones===null) return;
+  await guardarCambioHistorico("update_alquiler_complemento", null, {id_inmueble:idInmueble, metros_cuadrados:superficie, impuesto_servicio, estado_impuesto, vencimiento_impuesto, observaciones}, idInmueble, "Guardando datos complementarios…");
+};
+window.agregarPendienteAlquiler = async function(idInmueble){
+  const tipo = prompt("Tipo de pendiente (ej. Plano, Impuesto, Contrato, Resolución)");
+  if(!tipo) return;
+  const detalle = prompt("Detalle u observación", ""); if(detalle===null) return;
+  const vencimiento = prompt("Fecha límite (AAAA-MM-DD, opcional)", ""); if(vencimiento===null) return;
+  const responsable = prompt("Responsable del seguimiento (opcional)", ""); if(responsable===null) return;
+  await guardarCambioHistorico("add_alquiler_pendiente", null, {id_inmueble:idInmueble, tipo, detalle, vencimiento, responsable}, idInmueble, "Agregando pendiente…");
+};
+window.editarPendienteAlquiler = async function(idInmueble,idPendiente){
+  const p=(window.PENDIENTES_ACTUALES||[]).find(x=>Number(x["ID"])===Number(idPendiente)); if(!p)return;
+  const tipo=prompt("Tipo",p["Tipo"]||"");if(!tipo)return;
+  const detalle=prompt("Detalle",p["Detalle"]||"");if(detalle===null)return;
+  const vencimiento=prompt("Fecha límite (AAAA-MM-DD)",fechaParaEditar(p["Vencimiento"]));if(vencimiento===null)return;
+  const responsable=prompt("Responsable",p["Responsable"]||"");if(responsable===null)return;
+  await guardarCambioHistorico("update_alquiler_pendiente",idPendiente,{tipo,detalle,vencimiento,responsable},idInmueble,"Actualizando pendiente…");
+};
+window.resolverPendienteAlquiler = async function(idInmueble, idPendiente, estado){
+  await guardarCambioHistorico("toggle_alquiler_pendiente", idPendiente, {estado}, idInmueble, estado==="RESUELTO" ? "Resolviendo pendiente…" : "Reabriendo pendiente…");
+};
+window.borrarPendienteAlquiler = async function(idInmueble,idPendiente){
+  if(!confirm("¿Borrar este pendiente?")) return;
+  await guardarCambioHistorico("delete_alquiler_pendiente",idPendiente,{},idInmueble,"Eliminando pendiente…");
+};
+window.subirArchivoAlquiler = async function(idInmueble){
+  const input=document.getElementById("archivo-alquiler-"+idInmueble), file=input && input.files[0];
+  if(!file) return mostrarToast("Elegí un archivo primero.",true);
+  if(file.size>8*1024*1024) return mostrarToast("El archivo supera el límite de 8 MB.",true);
+  const categoria=document.getElementById("categoria-alquiler-"+idInmueble)?.value||"Otros";
+  const base64=await new Promise((ok,fail)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=fail;r.readAsDataURL(file);});
+  mostrarCargando("Subiendo archivo a Drive…");
+  try{const res=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"upload_alquiler_archivo",data:{id_inmueble:idInmueble,nombre:"["+categoria+"] "+file.name,mime_type:file.type,base64},usuario:USUARIO_ACTUAL})}).then(r=>r.json());if(!res.ok)throw new Error(res.error);mostrarToast("Archivo guardado en Drive.");abrirDetalle(idInmueble);}catch(err){mostrarToast("Error: "+err.message,true);}finally{ocultarCargando();}
+};
+window.borrarArchivoAlquiler = async function(idInmueble,idArchivo){
+  if(!confirm("¿Borrar este archivo de Drive?")) return;
+  await guardarCambioHistorico("delete_alquiler_archivo",idArchivo,{},idInmueble,"Eliminando archivo…");
 };
 
 /* ---------- Modal alta/edición ---------- */
