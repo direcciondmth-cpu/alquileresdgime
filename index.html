@@ -340,6 +340,34 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
   animation:girar .6s linear infinite;
 }
 .btn-primary.cargando::after, .btn-ghost.cargando::after{border-color:rgba(255,255,255,.35);border-top-color:#fff;}
+
+/* ============ NAVEGACIÓN LATERAL + MÓVIL ============ */
+.btn-menu{display:none;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35);font-size:20px;width:36px;height:36px;align-items:center;justify-content:center;}
+@media(min-width:900px){
+  header.top{position:fixed;inset:0 auto 0 0;width:236px;border-bottom:none;border-right:3px solid var(--teal-2);padding:0;overflow-y:auto;}
+  .top-row{height:100%;padding:22px 14px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:18px;}
+  .brand{flex:none;}.brand .logo-img{width:42px;height:42px;}.brand .txt h1{white-space:normal;font-size:18px;}.brand .txt p{white-space:normal;line-height:1.35;}
+  .nav-tabs{display:flex;order:0;width:100%;background:transparent;padding:0;flex-direction:column;gap:4px;}
+  .nav-tabs button{flex:none;width:100%;text-align:left;padding:11px 12px;border-left:3px solid transparent;}
+  .nav-tabs button.activo{border-left-color:var(--oliva);}
+  .top-actions{margin-top:auto;flex-wrap:wrap;}.top-actions .btn{flex:1;justify-content:center;}
+  main{max-width:none;margin-left:236px;padding:26px 30px 48px;min-height:100vh;}
+  footer{margin-left:236px;}
+}
+@media(max-width:899px){
+  .btn-menu{display:inline-flex;}
+  .nav-tabs{position:fixed;top:0;left:0;bottom:0;width:min(82vw,300px);z-index:120;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:82px 14px 20px;background:var(--azul-950);border-radius:0;transform:translateX(-105%);transition:transform .2s ease;box-shadow:8px 0 25px rgba(0,0,0,.25);}
+  .nav-tabs.abierto{transform:translateX(0);}
+  .nav-tabs button{flex:none;text-align:left;padding:12px 14px;}
+  .nav-tabs::before{content:'Menú';position:absolute;top:22px;left:18px;font-family:var(--serif);font-size:20px;color:#fff;}
+  body.menu-abierto::after{content:'';position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:110;}
+  .top-row{flex-wrap:nowrap;}.brand{order:1;}.top-actions{order:2;}.nav-tabs{order:3;}
+}
+@media(max-width:560px){
+  main{padding:14px 12px 34px;}.top-row{padding:8px 0;}.top-actions{gap:5px;}.campanita{width:34px;height:34px;}
+  .grid3{grid-template-columns:1fr !important;}.campo input,.campo select,textarea{font-size:16px;min-height:42px;}
+  input[type=file]{width:100%;max-width:100% !important;min-height:42px;}.btn{min-height:38px;}.modal-body{padding:14px 12px;}
+}
 </style>
 </head>
 <body>
@@ -358,13 +386,13 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
       <button class="activo" data-vista="inicio">Inicio</button>
       <button data-vista="alquileres">Alquileres</button>
       <button data-vista="gestiones">Gestiones</button>
-      <button data-vista="calendario">Calendario</button>
       <button data-vista="alertas">Alertas</button>
       <button data-vista="enlaces">Enlaces</button>
       <button data-vista="config">Configuración</button>
     </nav>
 
     <div class="top-actions">
+      <button class="btn-menu" id="btn-menu" aria-label="Abrir menú" aria-expanded="false">☰</button>
       <button class="campanita" id="btn-campanita" title="Ver alertas">
         🔔<span class="badge-count" id="campanita-count">0</span>
       </button>
@@ -407,6 +435,11 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
         <div class="panel-head"><h3>Distribución por estado de trámite</h3></div>
         <div class="barras" id="barras-estado"><div class="vacio-panel">Cargando…</div></div>
       </div>
+    </div>
+    <div class="panel" style="margin-top:16px;">
+      <div class="panel-head"><h3>Calendario de vencimientos y tareas</h3><button class="btn btn-sm" id="btn-exportar-calendario">⇩ Excel</button></div>
+      <div class="toolbar" style="padding:0 14px;"><div class="filtros"><input type="month" id="calendario-mes"><select id="calendario-tipo"><option value="">Todos los eventos</option><option value="Contrato">Contratos</option><option value="Visita">Visitas</option><option value="Pendiente">Pendientes</option></select></div></div>
+      <div id="lista-calendario"><div class="vacio-panel">Cargando calendario…</div></div>
     </div>
   </section>
 
@@ -455,15 +488,6 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
         </tbody>
       </table>
     </div>
-  </section>
-
-  <!-- ======================= VISTA: CALENDARIO ======================= -->
-  <section class="vista" id="vista-calendario">
-    <p class="eyebrow">Agenda de trabajo</p>
-    <h2 class="section-title">Calendario de vencimientos y tareas</h2>
-    <p class="section-sub">Reúne fines de contrato, visitas registradas y pendientes con fecha límite.</p>
-    <div class="toolbar"><div class="filtros"><input type="month" id="calendario-mes"><select id="calendario-tipo"><option value="">Todos los eventos</option><option value="Contrato">Contratos</option><option value="Visita">Visitas</option><option value="Pendiente">Pendientes</option></select></div><div class="filtros"><button class="btn btn-sm" id="btn-exportar-calendario">⇩ Excel</button></div></div>
-    <div class="panel"><div id="lista-calendario"><div class="vacio-panel">Cargando calendario…</div></div></div>
   </section>
 
   <!-- ======================= VISTA: GESTIONES ======================= -->
@@ -625,7 +649,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbx4hpddqwRVYP-NVbIKNyUWxF1bUJwGAU9LmwGynYJCgYux-IHYvuDATUv3pBqfC5Uy/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzNCTZhMf_K4es-b6oeYd_eF9jFYWFTOz0Ki9DqiLjI0fvFx9cquQwuZT2OHdpqvLxz/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
@@ -699,8 +723,11 @@ function irAVista(nombre, filtroVig){
   }
   window.scrollTo({top:0, behavior:"smooth"});
 }
+const navTabs=document.querySelector(".nav-tabs");
+const btnMenu=document.getElementById("btn-menu");
+btnMenu.addEventListener("click",()=>{const abierto=navTabs.classList.toggle("abierto");document.body.classList.toggle("menu-abierto",abierto);btnMenu.setAttribute("aria-expanded",abierto?"true":"false");});
 document.querySelectorAll(".nav-tabs button").forEach(b=>{
-  b.addEventListener("click", ()=>irAVista(b.dataset.vista));
+  b.addEventListener("click", ()=>{irAVista(b.dataset.vista);navTabs.classList.remove("abierto");document.body.classList.remove("menu-abierto");btnMenu.setAttribute("aria-expanded","false");});
 });
 document.getElementById("btn-campanita").addEventListener("click", ()=>irAVista("alertas"));
 document.querySelectorAll("[data-goto]").forEach(el=>{
@@ -760,7 +787,7 @@ async function cargarGestiones(){
       <div style="display:flex;gap:10px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;"><div><strong>${g["Efector"]||"Sin efector"}</strong><div style="font-size:13px;color:var(--muted);margin-top:3px;">${g["Domicilio"]||"—"}${g["Localidad"] ? ' · '+g["Localidad"] : ''}</div></div><span class="badge badge-ambar">${g["Estado"]||"RELEVADO"}</span></div>
       <div style="font-size:12px;color:var(--muted);margin:9px 0;">Visita: ${formatoFecha(g["Fecha Visita"])} · ${g["Metros Cuadrados"] ? g["Metros Cuadrados"]+' m²' : 'm² sin cargar'} · ${g["Monto Estimado ($)"] ? formatoMoneda(g["Monto Estimado ($)"]) : 'monto sin cargar'}</div>
       ${g["Observaciones"] ? `<div style="font-size:13px;margin-bottom:9px;">${g["Observaciones"]}</div>` : ''}
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="file" id="archivo-gestion-${g["ID"]}" accept="image/*,.pdf,.doc,.docx" style="max-width:230px;font-size:12px;"><button class="btn btn-sm" onclick="subirArchivoGestion(${g["ID"]})">Adjuntar a Drive</button><button class="btn btn-sm" onclick="verArchivosGestion(${g["ID"]})">Ver archivos</button><button class="btn btn-sm" onclick="verHistorialGestion(${g["ID"]})">Historial</button><button class="btn btn-sm" onclick="editarGestionPanel(${g["ID"]})">Editar</button><button class="btn btn-sm" onclick="cambiarEstadoGestion(${g["ID"]})">Estado</button>${g["Estado"]!=="CONVERTIDO EN ALQUILER" ? `<button class="btn btn-sm btn-primary" onclick="convertirGestionAlquiler(${g["ID"]})">Convertir en alquiler</button>` : ''}</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="file" id="archivo-gestion-${g["ID"]}" accept="image/*,.pdf,.doc,.docx" capture="environment" style="max-width:230px;font-size:12px;"><button class="btn btn-sm" onclick="subirArchivoGestion(${g["ID"]})">Adjuntar a Drive</button><button class="btn btn-sm" onclick="verArchivosGestion(${g["ID"]})">Ver archivos</button><button class="btn btn-sm" onclick="verHistorialGestion(${g["ID"]})">Historial</button><button class="btn btn-sm" onclick="editarGestionPanel(${g["ID"]})">Editar</button><button class="btn btn-sm" onclick="cambiarEstadoGestion(${g["ID"]})">Estado</button>${g["Estado"]!=="CONVERTIDO EN ALQUILER" ? `<button class="btn btn-sm btn-primary" onclick="convertirGestionAlquiler(${g["ID"]})">Convertir en alquiler</button>` : ''}</div>
       <div id="archivos-gestion-${g["ID"]}" style="font-size:12px;margin-top:8px;"></div>
       <div id="historial-gestion-${g["ID"]}" style="font-size:12px;margin-top:8px;"></div>
     </div>`).join('');
@@ -1153,7 +1180,7 @@ window.abrirDetalle = async function(id){
 
     <div class="tag-h3">Archivos del alquiler</div>
     <div style="font-size:13px;margin-bottom:8px;">${archivosAlquiler.length ? archivosAlquiler.map(a=>`<a href="${a["URL Drive"]}" target="_blank" rel="noopener">${a["Nombre Archivo"]}</a> <button class="btn btn-sm btn-danger" onclick="borrarArchivoAlquiler(${id},${a["ID"]})">Borrar</button>`).join(' · ') : 'Sin archivos adjuntos.'}</div>
-    <select id="categoria-alquiler-${id}" style="max-width:150px;"><option>Planos</option><option>Contratos</option><option>Fotos</option><option>Impuestos</option><option>Otros</option></select> <input type="file" id="archivo-alquiler-${id}" accept="image/*,.pdf,.doc,.docx" style="max-width:245px;font-size:12px;"> <button class="btn btn-sm" onclick="subirArchivoAlquiler(${id})">Adjuntar a Drive</button>
+    <select id="categoria-alquiler-${id}" style="max-width:150px;"><option>Planos</option><option>Contratos</option><option>Fotos</option><option>Impuestos</option><option>Otros</option></select> <input type="file" id="archivo-alquiler-${id}" accept="image/*,.pdf,.doc,.docx" capture="environment" style="max-width:245px;font-size:12px;"> <button class="btn btn-sm" onclick="subirArchivoAlquiler(${id})">Adjuntar a Drive</button>
   `;
   pintarEvolucionMontos(id, historialMontos);
   modalDetalleBg.classList.add("abierto");
