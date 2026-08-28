@@ -366,6 +366,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
   .top-actions .campanita{width:36px;height:36px;}
 }
 @media(max-width:899px){
+  header.top{z-index:130;}
   .btn-menu{display:inline-flex;}
   .nav-tabs{position:fixed;top:0;left:0;bottom:0;width:min(82vw,300px);z-index:120;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:82px 14px 20px;background:var(--azul-950);border-radius:0;transform:translateX(-105%);transition:transform .2s ease;box-shadow:8px 0 25px rgba(0,0,0,.25);}
   .nav-tabs.abierto{transform:translateX(0);}
@@ -405,7 +406,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     </nav>
 
     <div class="top-actions">
-      <button class="btn-menu" id="btn-menu" aria-label="Abrir menú" aria-expanded="false">☰</button>
+      <button class="btn-menu" id="btn-menu" aria-label="Abrir menú" aria-expanded="false" onclick="toggleMenuMobile()">☰</button>
       <button class="campanita" id="btn-campanita" title="Ver alertas">
         🔔<span class="badge-count" id="campanita-count">0</span>
       </button>
@@ -663,7 +664,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
    CONFIGURACIÓN — reemplazá esta URL por la de tu implementación
    de Google Apps Script (ver Codigo_AppsScript.gs, paso 5).
    ============================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbx4hpddqwRVYP-NVbIKNyUWxF1bUJwGAU9LmwGynYJCgYux-IHYvuDATUv3pBqfC5Uy/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzNCTZhMf_K4es-b6oeYd_eF9jFYWFTOz0Ki9DqiLjI0fvFx9cquQwuZT2OHdpqvLxz/exec";
 const USUARIO_ACTUAL = "usuario_dashboard"; // reemplazar por login real si se agrega
 
 let DATA = [];
@@ -739,7 +740,7 @@ function irAVista(nombre, filtroVig){
 }
 const navTabs=document.querySelector(".nav-tabs");
 const btnMenu=document.getElementById("btn-menu");
-btnMenu.addEventListener("click",()=>{const abierto=navTabs.classList.toggle("abierto");document.body.classList.toggle("menu-abierto",abierto);btnMenu.setAttribute("aria-expanded",abierto?"true":"false");});
+window.toggleMenuMobile=function(){const abierto=navTabs.classList.toggle("abierto");document.body.classList.toggle("menu-abierto",abierto);btnMenu.setAttribute("aria-expanded",abierto?"true":"false");};
 document.querySelectorAll(".nav-tabs button").forEach(b=>{
   b.addEventListener("click", ()=>{irAVista(b.dataset.vista);navTabs.classList.remove("abierto");document.body.classList.remove("menu-abierto");btnMenu.setAttribute("aria-expanded","false");});
 });
