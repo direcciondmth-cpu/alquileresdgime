@@ -172,7 +172,7 @@ main{max-width:1360px;margin:0 auto;padding:16px 16px 40px;width:100%;}
 }
 @media(min-width:640px){ .filtros input[type=text],.filtros select{font-size:13px;} }
 .filtros input[type=text]{min-width:220px;}
-.pill{font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:20px;border:1px solid var(--linea);background:#fff;cursor:pointer;color:var(--tinta-suave);}
+.pill{font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:20px;border:1px solid var(--linea);background:#fff;cursor:pointer;color:var(--tinta-suave);display:inline-flex;align-items:center;gap:6px;}
 .pill.activo{background:var(--teal-1);color:#fff;border-color:var(--teal-1);}
 
 /* ============ TABLA ============ */
@@ -218,8 +218,20 @@ td.acciones{display:flex;gap:6px;}
 .badge-verde{background:var(--verde-bg);color:#3f7d5c;}
 .badge-gris{background:#e7e7e3;color:var(--tinta-suave);}
 
+/* ============ ICONOS (SVG en línea, look profesional, sin emojis) ============ */
+.ico{width:1em;height:1em;display:inline-block;flex:none;vertical-align:-0.15em;}
+.ico-lg{width:2em;height:2em;}
+.btn .ico{vertical-align:-0.2em;}
+.campanita .ico{width:16px;height:16px;}
+.btn-menu .ico{width:20px;height:20px;}
+.dot{width:8px;height:8px;min-width:8px;border-radius:50%;display:inline-block;flex:none;}
+.dot-rojo{background:var(--rojo);}
+.dot-ambar{background:var(--ambar);}
+.dot-verde{background:#3f7d5c;}
+.dot-gris{background:var(--tinta-suave);}
+
 .vacio{padding:50px 20px;text-align:center;color:var(--tinta-suave);}
-.vacio .icono{font-size:26px;margin-bottom:6px;}
+.vacio .icono{margin-bottom:6px;color:var(--tinta-suave);display:flex;justify-content:center;}
 
 /* ============ ALERTAS módulo ============ */
 .grupo-alertas{margin-bottom:16px;}
@@ -406,12 +418,12 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     </nav>
 
     <div class="top-actions">
-      <button class="btn-menu" id="btn-menu" aria-label="Abrir menú" aria-expanded="false" onclick="toggleMenuMobile()">☰</button>
+      <button class="btn-menu" id="btn-menu" aria-label="Abrir menú" aria-expanded="false" onclick="toggleMenuMobile()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
       <button class="campanita" id="btn-campanita" title="Ver alertas">
-        🔔<span class="badge-count" id="campanita-count">0</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge-count" id="campanita-count">0</span>
       </button>
-      <button class="btn btn-ghost btn-sm" id="btn-refrescar">↻ <span class="txt-btn">Refrescar</span></button>
-      <button class="btn btn-primary btn-sm" id="btn-nuevo">+ <span class="txt-btn">Nuevo</span></button>
+      <button class="btn btn-ghost btn-sm" id="btn-refrescar"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> <span class="txt-btn">Refrescar</span></button>
+      <button class="btn btn-primary btn-sm" id="btn-nuevo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> <span class="txt-btn">Nuevo</span></button>
     </div>
   </div>
 </header>
@@ -419,7 +431,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
 <main>
 
   <div class="config-note" id="config-note">
-    ⚙ Falta conectar la API. Editá la constante <code>API_URL</code> al final de este archivo con la URL de tu implementación de Google Apps Script.
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 8v6M4.22 4.22l4.24 4.24m6.36 6.36l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m6.36-6.36l4.24-4.24"/></svg> Falta conectar la API. Editá la constante <code>API_URL</code> al final de este archivo con la URL de tu implementación de Google Apps Script.
   </div>
 
   <!-- ======================= VISTA: INICIO ======================= -->
@@ -451,7 +463,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
       </div>
     </div>
     <div class="panel" style="margin-top:16px;">
-      <div class="panel-head"><h3>Calendario de vencimientos y tareas</h3><button class="btn btn-sm" id="btn-exportar-calendario">⇩ Excel</button></div>
+      <div class="panel-head"><h3>Calendario de vencimientos y tareas</h3><button class="btn btn-sm" id="btn-exportar-calendario"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button></div>
       <div class="toolbar" style="padding:0 14px;"><div class="filtros"><input type="month" id="calendario-mes"><select id="calendario-tipo"><option value="">Todos los eventos</option><option value="Contrato">Contratos</option><option value="Visita">Visitas</option><option value="Pendiente">Pendientes</option></select></div></div>
       <div id="lista-calendario"><div class="vacio-panel">Cargando calendario…</div></div>
     </div>
@@ -477,14 +489,14 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
         <input type="date" id="filtro-fin-desde" title="Fin de contrato desde">
         <input type="date" id="filtro-fin-hasta" title="Fin de contrato hasta">
         <span class="pill activo" data-vig="">Todos</span>
-        <span class="pill" data-vig="VIGENTE">🟢 Vigentes</span>
-        <span class="pill" data-vig="POR VENCER">🟡 Por vencer</span>
-        <span class="pill" data-vig="VENCIDO">🔴 Vencidos</span>
-        <span class="pill" data-vig="SIN DATO">⚪ Sin dato</span>
+        <span class="pill" data-vig="VIGENTE"><span class="dot dot-verde"></span> Vigentes</span>
+        <span class="pill" data-vig="POR VENCER"><span class="dot dot-ambar"></span> Por vencer</span>
+        <span class="pill" data-vig="VENCIDO"><span class="dot dot-rojo"></span> Vencidos</span>
+        <span class="pill" data-vig="SIN DATO"><span class="dot dot-gris"></span> Sin dato</span>
       </div>
       <div class="filtros">
-        <button class="btn btn-sm" id="btn-exportar-excel">⇩ Excel</button>
-        <button class="btn btn-sm" id="btn-exportar-pdf">⇩ PDF</button>
+        <button class="btn btn-sm" id="btn-exportar-excel"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+        <button class="btn btn-sm" id="btn-exportar-pdf"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF</button>
       </div>
     </div>
 
@@ -498,7 +510,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
           </tr>
         </thead>
         <tbody id="tbody-alquileres">
-          <tr><td colspan="10" class="vacio"><div class="icono">⏳</div>Cargando información desde la base…</td></tr>
+          <tr><td colspan="10" class="vacio"><div class="icono"><svg class="ico ico-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>Cargando información desde la base…</td></tr>
         </tbody>
       </table>
     </div>
@@ -528,7 +540,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     </div>
     <div class="panel">
       <div class="panel-head"><h3>Gestiones registradas</h3><span id="gestion-contador" class="badge badge-gris">0</span></div>
-      <div class="toolbar" style="padding:12px 14px 0;"><div class="filtros"><input id="buscador-gestiones" placeholder="Buscar efector, domicilio o contacto…"><select id="filtro-gestion-estado"><option value="">Todos los estados</option><option>RELEVADO</option><option>APTO</option><option>NO APTO</option><option>EN NEGOCIACIÓN</option><option>DESCARTADO</option><option>CONVERTIDO EN ALQUILER</option></select></div><div class="filtros"><button class="btn btn-sm" id="btn-exportar-gestiones">⇩ Excel</button></div></div>
+      <div class="toolbar" style="padding:12px 14px 0;"><div class="filtros"><input id="buscador-gestiones" placeholder="Buscar efector, domicilio o contacto…"><select id="filtro-gestion-estado"><option value="">Todos los estados</option><option>RELEVADO</option><option>APTO</option><option>NO APTO</option><option>EN NEGOCIACIÓN</option><option>DESCARTADO</option><option>CONVERTIDO EN ALQUILER</option></select></div><div class="filtros"><button class="btn btn-sm" id="btn-exportar-gestiones"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button></div></div>
       <div id="lista-gestiones"><div class="vacio-panel">Cargando gestiones…</div></div>
     </div>
   </section>
@@ -550,7 +562,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     <div class="panel" style="padding:16px;">
       <div class="panel-head" style="margin:-16px -16px 16px;">
         <h3>Calculadora de alquileres · Arquiler</h3>
-        <a class="verlink" href="https://arquiler.com/mini?theme=light&amp;backgroundColor=ffffff" target="_blank" rel="noopener">Abrir en otra pestaña ↗</a>
+        <a class="verlink" href="https://arquiler.com/mini?theme=light&amp;backgroundColor=ffffff" target="_blank" rel="noopener">Abrir en otra pestaña <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
       </div>
       <iframe
         title="Calculadora de alquileres"
@@ -572,7 +584,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     <div class="panel" style="margin-bottom:20px;">
       <div class="panel-head">
         <h3>Destinatarios</h3>
-        <div style="display:flex;gap:8px;"><button class="btn btn-sm" id="btn-crear-respaldo">▣ Crear respaldo</button><button class="btn btn-sm btn-primary" id="btn-enviar-prueba">✉ Enviar prueba ahora</button></div>
+        <div style="display:flex;gap:8px;"><button class="btn btn-sm" id="btn-crear-respaldo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><line x1="10" y1="12" x2="14" y2="12"/></svg> Crear respaldo</button><button class="btn btn-sm btn-primary" id="btn-enviar-prueba"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg> Enviar prueba ahora</button></div>
       </div>
       <div style="padding:14px;">
         <div class="grid2" style="grid-template-columns:2fr 1.3fr auto;align-items:end;">
@@ -585,7 +597,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
     </div>
 
     <div class="config-note" style="margin-bottom:0;">
-      ℹ El envío automático hay que activarlo una sola vez desde el editor de Apps Script (función <code>crearTriggerDiario</code>). Ver instrucciones dentro de <code>Codigo_AppsScript.gs</code>.
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> El envío automático hay que activarlo una sola vez desde el editor de Apps Script (función <code>crearTriggerDiario</code>). Ver instrucciones dentro de <code>Codigo_AppsScript.gs</code>.
     </div>
   </section>
 
@@ -598,7 +610,7 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
   <div class="modal">
     <div class="modal-head">
       <h3 id="modal-titulo">Nuevo alquiler</h3>
-      <button class="btn btn-ghost btn-sm" id="btn-cerrar-modal">✕</button>
+      <button class="btn btn-ghost btn-sm" id="btn-cerrar-modal"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="f-id">
@@ -641,14 +653,14 @@ footer{text-align:center;padding:16px;color:var(--tinta-suave);font-family:var(-
   <div class="modal">
     <div class="modal-head">
       <h3 id="detalle-titulo">Detalle del alquiler</h3>
-      <button class="btn btn-ghost btn-sm" id="btn-cerrar-detalle">✕</button>
+      <button class="btn btn-ghost btn-sm" id="btn-cerrar-detalle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" id="detalle-body">
       <!-- se completa dinámicamente -->
     </div>
     <div class="modal-foot">
       <button class="btn" id="btn-cerrar-detalle-2">Cerrar</button>
-      <button class="btn btn-primary" id="btn-editar-desde-detalle">✎ Editar este alquiler</button>
+      <button class="btn btn-primary" id="btn-editar-desde-detalle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Editar este alquiler</button>
     </div>
   </div>
 </div>
@@ -672,22 +684,59 @@ let GESTIONES = [];
 let ALERTAS_ACTUALES = {};
 let FILTRO_VIGENCIA = "";
 
+/* ---------- Iconos SVG (reemplazan los emojis: look consistente en todos
+   los sistemas operativos y navegadores, y se puede colorear con CSS) ---------- */
+const ICONS = {
+  menu: '<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 8v6M4.22 4.22l4.24 4.24m6.36 6.36l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m6.36-6.36l4.24-4.24"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/>',
+  archive: '<path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><line x1="10" y1="12" x2="14" y2="12"/>',
+  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  refresh: '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+  filetext: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  pin: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  dollar: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  alert: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  extlink: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>'
+};
+function icon(name, cls){
+  return `<svg class="ico ${cls||''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||''}</svg>`;
+}
+function dot(claseColor){ return `<span class="dot ${claseColor}"></span>`; }
+
 /* ---------- Utilidades ---------- */
 function formatoMoneda(n){
   if(n===null||n===undefined||n==="") return "—";
   return "$ " + Number(n).toLocaleString("es-AR",{minimumFractionDigits:0,maximumFractionDigits:0});
 }
 /* Parsea un monto que puede venir como número, string vacío, o texto con
-   formato ("$ 720.000", "720000,50", etc). Devuelve null si NO hay dato
-   real (para no confundir "sin cargar" con "vale $0"). */
+   formato ("$ 720.000", "720000,50", "1.250.000", etc). Devuelve null si NO
+   hay dato real (para no confundir "sin cargar" con "vale $0").
+   Formato AR: el punto puede ser separador de miles ("1.250.000") o, si
+   además hay coma decimal, separador de miles junto a ella ("1.250.000,50").
+   Si el string NO tiene coma pero tiene un punto seguido de exactamente 3
+   dígitos (patrón de miles: 1.250 / 1.250.000), también se trata como
+   separador de miles y se descarta — si no, "1.250.000" se leería como 1.25. */
 function parseMonto(v){
   if(v === null || v === undefined || v === "") return null;
   if(typeof v === "number"){ return isNaN(v) ? null : v; }
   let s = String(v).trim();
   if(s === "") return null;
   s = s.replace(/\$/g, "").trim();
-  // formato AR: punto de miles, coma decimal -> normalizar a punto decimal
-  if(s.includes(",") ){ s = s.replace(/\./g, "").replace(",", "."); }
+  if(s.includes(",")){
+    // formato AR con decimales: punto de miles, coma decimal -> normalizar a punto decimal
+    s = s.replace(/\./g, "").replace(",", ".");
+  } else if(/^-?\d{1,3}(\.\d{3})+$/.test(s)){
+    // formato AR sin decimales pero con puntos de miles: "1.250.000"
+    s = s.replace(/\./g, "");
+  }
   const n = parseFloat(s);
   return isNaN(n) ? null : n;
 }
@@ -699,10 +748,10 @@ function formatoFecha(f){
 }
 function badgeVigencia(estado, dias){
   const map = {
-    "VENCIDO": ["badge-rojo","🔴 Vencido"],
-    "POR VENCER": ["badge-ambar", `🟡 Vence en ${dias} días`],
-    "VIGENTE": ["badge-verde","🟢 Vigente"],
-    "SIN DATO": ["badge-gris","⚪ Sin dato"]
+    "VENCIDO": ["badge-rojo", `${dot("dot-rojo")} Vencido`],
+    "POR VENCER": ["badge-ambar", `${dot("dot-ambar")} Vence en ${dias} días`],
+    "VIGENTE": ["badge-verde", `${dot("dot-verde")} Vigente`],
+    "SIN DATO": ["badge-gris", `${dot("dot-gris")} Sin dato`]
   };
   const [cls, txt] = map[estado] || ["badge-gris", estado || "—"];
   return `<span class="badge ${cls}">${txt}</span>`;
@@ -889,7 +938,7 @@ function pintarCorreos(correos){
     <li style="cursor:default;">
       <div>
         <div class="titulo-item">${c.email}</div>
-        <div class="sub-item">${c.alias || "sin alias"} · ${c.activo ? "🟢 activo" : "⚪ pausado"}</div>
+        <div class="sub-item">${c.alias || "sin alias"} · ${c.activo ? dot("dot-verde")+" activo" : dot("dot-gris")+" pausado"}</div>
       </div>
       <div style="display:flex;gap:6px;">
         <button class="btn btn-sm" onclick="toggleCorreo('${c.email}', ${!c.activo})">${c.activo ? "Pausar" : "Activar"}</button>
@@ -982,7 +1031,7 @@ function pintarInicio(){
   const top = conFecha.slice(0,6);
   const lista = document.getElementById("lista-vencimientos");
   if(top.length===0){
-    lista.innerHTML = `<li class="vacio-panel">No hay vencimientos próximos. 🟢</li>`;
+    lista.innerHTML = `<li class="vacio-panel">${icon("check")} No hay vencimientos próximos.</li>`;
   }else{
     lista.innerHTML = top.map(r=>`
       <li onclick="abrirDetalle(${r["ID"]})">
@@ -1026,11 +1075,11 @@ function pintarAlertas(alertas){
     };
   }
   const grupos = [
-    { key:"vencidos", titulo:"🔴 Contratos vencidos", icono:"badge-rojo" },
-    { key:"por_vencer", titulo:"🟡 Por vencer (próximos 30 días)", icono:"badge-ambar" },
-    { key:"falta_resolucion", titulo:"📄 Falta resolución / documentación", icono:"badge-gris" },
-    { key:"en_tramite", titulo:"⏳ Expedientes en trámite", icono:"badge-gris" },
-    { key:"sin_dato", titulo:"⚪ Sin fecha cargada (revisar dato)", icono:"badge-gris" }
+    { key:"vencidos", titulo:`${dot("dot-rojo")} Contratos vencidos`, icono:"badge-rojo" },
+    { key:"por_vencer", titulo:`${dot("dot-ambar")} Por vencer (próximos 30 días)`, icono:"badge-ambar" },
+    { key:"falta_resolucion", titulo:`${icon("filetext")} Falta resolución / documentación`, icono:"badge-gris" },
+    { key:"en_tramite", titulo:`${icon("clock")} Expedientes en trámite`, icono:"badge-gris" },
+    { key:"sin_dato", titulo:`${dot("dot-gris")} Sin fecha cargada (revisar dato)`, icono:"badge-gris" }
   ];
   cont.innerHTML = grupos.map(g=>{
     const items = alertas[g.key] || [];
@@ -1050,8 +1099,8 @@ function pintarAlertas(alertas){
       </div>`;
   }).join("");
   const extras = [
-    {key:"pendientes_documentacion", titulo:"📌 Documentación y tareas pendientes"},
-    {key:"impuestos_pendientes", titulo:"💰 Impuestos o servicios pendientes"}
+    {key:"pendientes_documentacion", titulo:`${icon("pin")} Documentación y tareas pendientes`},
+    {key:"impuestos_pendientes", titulo:`${icon("dollar")} Impuestos o servicios pendientes`}
   ];
   cont.innerHTML += extras.map(g=>{const items=alertas[g.key]||[];return `<div class="grupo-alertas"><h3>${g.titulo} <span class="contador">${items.length}</span></h3>${items.length ? `<div class="tabla-wrap"><table><tbody>${items.map(x=>`<tr class="fila-click" onclick="abrirDetalle(${x["ID Inmueble"]})"><td>${x["Tipo"]||x["Impuesto / Servicio"]||"Pendiente"}</td><td>${x["Detalle"]||x["Estado Impuesto"]||"—"}</td><td>${x["Vencimiento"]?formatoFecha(x["Vencimiento"]):x["Vencimiento Impuesto"]?formatoFecha(x["Vencimiento Impuesto"]):"Sin fecha"}</td><td>Abrir alquiler →</td></tr>`).join('')}</tbody></table></div>`:`<div class="vacio-panel" style="background:#fff;border:1px solid var(--linea);">Sin registros en esta categoría.</div>`}</div>`;}).join('');
 }
@@ -1083,7 +1132,7 @@ function pintarTabla(){
   const filas = filasFiltradas();
   const tbody = document.getElementById("tbody-alquileres");
   if(filas.length === 0){
-    tbody.innerHTML = `<tr><td colspan="10" class="vacio"><div class="icono">🔍</div>No hay alquileres que coincidan con el filtro.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="vacio"><div class="icono">${icon("search","ico-lg")}</div>No hay alquileres que coincidan con el filtro.</td></tr>`;
     return;
   }
   tbody.innerHTML = filas.map(r => `
@@ -1098,7 +1147,7 @@ function pintarTabla(){
       <td data-label="Estado trámite">${r["Estado Trámite"] || "—"}</td>
       <td data-label="Vigencia">${badgeVigencia(r["Estado Vigencia"], r["Días para Vencer"])}</td>
       <td class="acciones" data-label="" onclick="event.stopPropagation()">
-        <button class="btn btn-sm" onclick="abrirEdicion(${r["ID"]})">✎</button>
+        <button class="btn btn-sm" onclick="abrirEdicion(${r["ID"]})">${icon("edit")}</button>
         <button class="btn btn-sm btn-danger" onclick="darDeBaja(${r["ID"]})">Baja</button>
       </td>
     </tr>
@@ -1251,7 +1300,7 @@ function pintarEvolucionMontos(idInmueble, filas){
   const max = Math.max(...conDato.map(f=>f._monto), 1);
 
   cont.innerHTML = `
-    ${sinDato > 0 ? `<div class="config-note" style="margin-bottom:10px;">⚠ ${sinDato} registro(s) de este inmueble no tienen un monto válido cargado y no se muestran en la línea de tiempo.</div>` : ""}
+    ${sinDato > 0 ? `<div class="config-note" style="margin-bottom:10px;">${icon("alert")} ${sinDato} registro(s) de este inmueble no tienen un monto válido cargado y no se muestran en la línea de tiempo.</div>` : ""}
     <div class="resumen-evolucion">
       <div class="chip-evolucion"><div class="lbl">Empezó pagando</div><div class="val">${formatoMoneda(montoInicial)}</div></div>
       <div class="chip-evolucion"><div class="lbl">Paga actualmente</div><div class="val">${formatoMoneda(montoActual)}</div></div>
